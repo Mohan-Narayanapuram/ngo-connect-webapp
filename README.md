@@ -170,7 +170,8 @@ npm run dev
 
 ## Author
 
-D. Pujith Ram Reddy\nMohan Narayanapuram
+- D. Pujith Ram Reddy
+- Mohan Narayanapuram
 
 ---
 
