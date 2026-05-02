@@ -1,21 +1,22 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import API from '../api';
 import Icon from '../components/Icon';
 import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
   const { login }  = useAuth();
   const navigate   = useNavigate();
-  const [role, setRole]   = useState('donor');
-  const [form, setForm]   = useState({ name: '', email: '', password: '', confirmPassword: '' });
-  const [error, setError] = useState('');
+  const [form, setForm]       = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [showPw, setShowPw]   = useState(false);
+  const [agreed, setAgreed]   = useState(false);
+  const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (form.password !== form.confirmPassword) {
-      setError('Passwords do not match.'); return;
-    }
+    if (form.password !== form.confirmPassword) { setError('Passwords do not match.'); return; }
+    if (form.password.length < 6) { setError('Password must be at least 6 characters.'); return; }
     setLoading(true); setError('');
     try {
       const res = await API.post('/api/auth/register', {
@@ -30,21 +31,25 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-gray-50 w-full flex flex-col">
-      <div className="p-6">
-        <Link to="/discover" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-800 transition-colors">
-          <Icon name="arrow-left" size={15} />
-          Back to home
-        </Link>
+
+      {/* Back button — aligned with card */}
+      <div className="flex justify-center pt-6 px-4">
+        <div className="w-full max-w-sm">
+          <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-800 transition-colors">
+            <Icon name="arrow-left" size={15} />
+            Back to home
+          </Link>
+        </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-4 pb-12">
+      <div className="flex-1 flex items-center justify-center px-4 pb-12 pt-6">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-100">
               <Icon name="user-plus" size={22} className="text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Create an account</h1>
-            <p className="text-sm text-gray-400 mt-1">Join NGO Connect and start making a difference.</p>
+            <h1 className="text-2xl font-black text-gray-900">Create your account</h1>
+            <p className="text-sm text-gray-400 mt-1">Join NGO Connect and start making a difference</p>
           </div>
 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
@@ -56,33 +61,32 @@ export default function Register() {
             )}
 
             {/* Role selector */}
-            <div className="mb-5">
+            <div className="mb-6">
               <label className="block text-sm font-semibold text-gray-700 mb-2">I want to</label>
               <div className="space-y-2">
-                {[
-                  { id: 'donor', icon: 'heart', title: 'Support NGOs as a donor', desc: 'Discover and donate to campaigns' },
-                  { id: 'ngo',   icon: 'building-2', title: 'Register my NGO', desc: 'Manage campaigns and connect with donors' },
-                ].map(r => (
-                  <button key={r.id} type="button" onClick={() => setRole(r.id)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
-                      role === r.id
-                        ? 'border-green-500 bg-green-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}>
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      role === r.id ? 'bg-green-600' : 'bg-gray-100'
-                    }`}>
-                      <Icon name={r.icon} size={15} className={role === r.id ? 'text-white' : 'text-gray-500'} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">{r.title}</p>
-                      <p className="text-xs text-gray-400">{r.desc}</p>
-                    </div>
-                    {role === r.id && (
-                      <Icon name="circle-check" size={16} className="text-green-600 ml-auto flex-shrink-0" />
-                    )}
-                  </button>
-                ))}
+                <div className="w-full flex items-center gap-3 p-3 rounded-xl border border-green-500 bg-green-50">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-green-600">
+                    <Icon name="heart" size={15} className="text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-gray-900">Support NGOs as a donor</p>
+                    <p className="text-xs text-gray-400">Discover and donate to campaigns</p>
+                  </div>
+                  <Icon name="circle-check" size={16} className="text-green-600 flex-shrink-0" />
+                </div>
+                <div className="w-full flex items-center gap-3 p-3 rounded-xl border border-dashed border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed select-none">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-100">
+                    <Icon name="building-2" size={15} className="text-gray-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-gray-500">Register my NGO</p>
+                    <p className="text-xs text-gray-400">Manage campaigns and connect with donors</p>
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">
+                    <Icon name="construction" size={9} />
+                    Coming Soon
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -91,43 +95,67 @@ export default function Register() {
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full name</label>
                 <div className="relative">
                   <Icon name="user" size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" />
-                  <input type="text" required placeholder="John Doe"
+                  <input type="text" required placeholder="Your full name"
                     value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent" />
+                    className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-shadow" />
                 </div>
               </div>
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email address</label>
                 <div className="relative">
                   <Icon name="mail" size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" />
                   <input type="email" required placeholder="you@example.com"
-                    value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent" />
+                    value={form.email} onChange={e => setForm({ ...form, email: e.target.value.toLowerCase() })}
+                    className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-shadow" />
                 </div>
               </div>
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
                 <div className="relative">
                   <Icon name="lock" size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" />
-                  <input type="password" required placeholder="Create a strong password"
+                  <input type={showPw ? 'text' : 'password'} required placeholder="Min. 6 characters"
                     value={form.password} onChange={e => setForm({ ...form, password: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent" />
+                    className="w-full border border-gray-200 rounded-xl pl-10 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-shadow" />
+                  <button type="button" onClick={() => setShowPw(p => !p)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors">
+                    <Icon name={showPw ? 'eye-off' : 'eye'} size={15} />
+                  </button>
                 </div>
               </div>
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Confirm password</label>
                 <div className="relative">
                   <Icon name="lock" size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none" />
-                  <input type="password" required placeholder="Re-enter your password"
+                  <input type={showPw ? 'text' : 'password'} required placeholder="Re-enter your password"
                     value={form.confirmPassword} onChange={e => setForm({ ...form, confirmPassword: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent" />
+                    className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition-shadow" />
                 </div>
               </div>
 
-              <button type="submit" disabled={loading}
-                className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 disabled:opacity-60 transition-colors mt-2">
+              {/* Terms checkbox */}
+              <label className="flex items-start gap-2.5 cursor-pointer select-none pt-1">
+                <input
+                  type="checkbox"
+                  required
+                  checked={agreed}
+                  onChange={e => setAgreed(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-gray-300 accent-green-600 flex-shrink-0 cursor-pointer"
+                />
+                <span className="text-xs text-gray-400 leading-relaxed">
+                  I agree to the{' '}
+                  <Link to="/terms" className="text-green-600 hover:underline font-medium">Terms of Service</Link>
+                  {' '}and{' '}
+                  <Link to="/privacy" className="text-green-600 hover:underline font-medium">Privacy Policy</Link>
+                </span>
+              </label>
+
+              <button type="submit" disabled={loading || !agreed}
+                className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-xl text-sm font-bold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all">
                 {loading
-                  ? <><svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Creating...</>
+                  ? <><svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Creating account…</>
                   : <><Icon name="user-check" size={15} />Create Account</>
                 }
               </button>
@@ -138,11 +166,6 @@ export default function Register() {
               <Link to="/login" className="text-green-600 font-semibold hover:underline">Sign in</Link>
             </p>
           </div>
-          <p className="text-center text-xs text-gray-300 mt-5">
-            By creating an account, you agree to our{' '}
-            <a href="#" className="hover:text-gray-400">Terms of Service</a> and{' '}
-            <a href="#" className="hover:text-gray-400">Privacy Policy</a>
-          </p>
         </div>
       </div>
     </div>
