@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon';
@@ -18,7 +17,7 @@ export default function Register() {
     if (form.password.length < 6) { setError('Password must be at least 6 characters.'); return; }
     setLoading(true); setError('');
     try {
-      const res = await axios.post('/api/auth/register', {
+      const res = await API.post('/api/auth/register', {
         name: form.name, email: form.email, password: form.password,
       });
       login(res.data.token, res.data.name);

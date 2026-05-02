@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Footer from '../components/Footer';
@@ -32,7 +31,7 @@ export default function DonatePage() {
 
   useEffect(() => {
     if (!ngoId) return;
-    axios.get(`/api/ngos/${ngoId}`)
+    API.get(`/api/ngos/${ngoId}`)
       .then(res => {
         setNgo(res.data);
         if (campaignId) {
@@ -50,7 +49,7 @@ export default function DonatePage() {
     }
     setSubmitting(true); setError('');
     try {
-      await axios.post('/api/donate', {
+      await API.post('/api/donate', {
         ngoId,
         campaignId: campaignId || undefined,
         amount: Number(amount),

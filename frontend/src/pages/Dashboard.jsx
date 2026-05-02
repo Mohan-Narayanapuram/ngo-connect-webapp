@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
@@ -155,7 +154,7 @@ function EditProfileModal({ profile, token, onClose, onSaved }) {
     setError(''); setSuccess('');
     setSaving(true);
     try {
-      const res = await axios.put('/api/users/me',
+      const res = await API.put('/api/users/me',
         { name, email },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -173,7 +172,7 @@ function EditProfileModal({ profile, token, onClose, onSaved }) {
     if (newPw.length < 6)    { setError('Password must be at least 6 characters.'); return; }
     setSaving(true);
     try {
-      await axios.put('/api/users/password',
+      await API.put('/api/users/password',
         { currentPassword: currentPw, newPassword: newPw },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -304,8 +303,8 @@ export default function Dashboard() {
     if (!user) { navigate('/login'); return; }
     const headers = { Authorization: `Bearer ${user.token}` };
     Promise.all([
-      axios.get('/api/users/me',        { headers }),
-      axios.get('/api/users/donations', { headers }),
+      API.get('/api/users/me',        { headers }),
+      API.get('/api/users/donations', { headers }),
     ])
       .then(([p, d]) => { setProfile(p.data); setDonations(d.data); })
       .catch(console.error)

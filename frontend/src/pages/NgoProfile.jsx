@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Footer from '../components/Footer';
@@ -89,7 +88,7 @@ export default function NgoProfile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`/api/ngos/${id}`)
+    API.get(`/api/ngos/${id}`)
       .then(res => setNgo(res.data))
       .catch(err => console.error(err))
       .finally(() => setLoading(false));

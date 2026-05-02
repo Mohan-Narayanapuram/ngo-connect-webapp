@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Footer from '../components/Footer';
@@ -41,7 +40,7 @@ export default function NgoList() {
   }, [location.search]);
 
   useEffect(() => {
-    axios.get('/api/ngos')
+    API.get('/api/ngos')
       .then(res => setNgos(res.data))
       .catch(console.error)
       .finally(() => setLoading(false));
