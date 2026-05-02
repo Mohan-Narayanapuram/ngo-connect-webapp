@@ -5,11 +5,11 @@ import Icon from '../components/Icon';
 import Navbar from '../components/Navbar';
 
 export default function NgoProfile() {
-  const { id }      = useParams();
-  const navigate    = useNavigate();
+  const { id }     = useParams();
+  const navigate   = useNavigate();
 
-  const [ngo,     setNgo]     = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [ngo,      setNgo]      = useState(null);
+  const [loading,  setLoading]  = useState(true);
   const [slideIdx, setSlideIdx] = useState(0);
   const timerRef = useRef(null);
 
@@ -20,7 +20,6 @@ export default function NgoProfile() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Build slides: NGO image + campaign images
   const slides = ngo
     ? [
         ngo.image || `https://picsum.photos/seed/${ngo._id}/1200/300`,
@@ -28,7 +27,6 @@ export default function NgoProfile() {
       ]
     : [];
 
-  // Auto-advance carousel
   useEffect(() => {
     if (slides.length <= 1) return;
     timerRef.current = setInterval(() => {
@@ -58,7 +56,7 @@ export default function NgoProfile() {
             <div className="h-24 skeleton rounded-2xl" />
             <div className="h-48 skeleton rounded-2xl" />
           </div>
-          <div className="w-72 h-72 skeleton rounded-2xl flex-shrink-0" />
+          <div className="w-72 h-64 skeleton rounded-2xl flex-shrink-0" />
         </div>
       </div>
     </div>
@@ -76,10 +74,8 @@ export default function NgoProfile() {
         <p className="text-xs text-gray-400 mb-5">
           This organization may have been removed or the link is broken.
         </p>
-        <Link
-          to="/discover"
-          className="text-xs text-green-600 border border-green-200 px-4 py-2 rounded-lg hover:bg-green-50 font-semibold transition-colors"
-        >
+        <Link to="/discover"
+          className="text-xs text-green-600 border border-green-200 px-4 py-2 rounded-lg hover:bg-green-50 font-semibold transition-colors">
           Back to listing
         </Link>
       </div>
@@ -103,7 +99,6 @@ export default function NgoProfile() {
 
         {/* ── Hero Carousel ── */}
         <div className="w-full h-56 bg-gray-100 relative overflow-hidden rounded-2xl mb-6 group">
-
           {slides.map((src, i) => (
             <img
               key={i}
@@ -116,10 +111,8 @@ export default function NgoProfile() {
             />
           ))}
 
-          {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
-          {/* Verified badge */}
           {ngo.verified && (
             <span className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-green-100 shadow-sm">
               <Icon name="badge-check" size={12} className="text-green-600" />
@@ -127,7 +120,6 @@ export default function NgoProfile() {
             </span>
           )}
 
-          {/* Prev / Next arrows */}
           {slides.length > 1 && (
             <>
               <button
@@ -147,7 +139,6 @@ export default function NgoProfile() {
             </>
           )}
 
-          {/* Dot indicators */}
           {slides.length > 1 && (
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
               {slides.map((_, i) => (
@@ -156,9 +147,7 @@ export default function NgoProfile() {
                   onClick={() => goTo(i)}
                   aria-label={`Go to slide ${i + 1}`}
                   className={`rounded-full transition-all duration-300 ${
-                    i === slideIdx
-                      ? 'w-5 h-1.5 bg-white'
-                      : 'w-1.5 h-1.5 bg-white/50 hover:bg-white/80'
+                    i === slideIdx ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/50 hover:bg-white/80'
                   }`}
                 />
               ))}
@@ -230,8 +219,7 @@ export default function NgoProfile() {
                       <div key={c._id || i} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col">
                         {c.image && (
                           <div className="h-28 rounded-lg overflow-hidden mb-3 bg-gray-100">
-                            <img
-                              src={c.image} alt={c.title}
+                            <img src={c.image} alt={c.title}
                               className="w-full h-full object-cover"
                               onError={e => { e.target.src = `https://picsum.photos/seed/c${i}/300/150`; }}
                             />
@@ -240,10 +228,8 @@ export default function NgoProfile() {
                         <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-2">{c.title}</h3>
                         <p className="text-xs text-gray-400 mb-3 line-clamp-2 flex-1">{c.description}</p>
                         <div className="w-full bg-gray-100 rounded-full h-1.5 mb-1.5">
-                          <div
-                            className="bg-green-500 h-1.5 rounded-full transition-all duration-500"
-                            style={{ width: `${pct}%` }}
-                          />
+                          <div className="bg-green-500 h-1.5 rounded-full transition-all duration-500"
+                            style={{ width: `${pct}%` }} />
                         </div>
                         <div className="flex justify-between text-xs text-gray-400 mb-3">
                           <span className="font-bold text-gray-800">
@@ -271,46 +257,47 @@ export default function NgoProfile() {
           <div className="w-full lg:w-72 flex-shrink-0 sticky top-20">
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
 
-              {/* NGO identity summary */}
-              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
-                <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center border border-green-100 flex-shrink-0">
-                  <Icon name="building-2" size={18} className="text-green-600" />
+              {/* NGO identity summary — tighter, bigger icon */}
+              <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-100">
+                <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center border border-green-100 flex-shrink-0">
+                  <Icon name="building-2" size={22} className="text-green-600" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-bold text-gray-900 truncate">{ngo.name}</p>
+                  <p className="text-xs font-bold text-gray-900 truncate leading-tight">{ngo.name}</p>
                   {ngo.cause && (
-                    <p className="text-xs text-green-600 font-medium truncate">{ngo.cause}</p>
+                    <p className="text-xs text-green-600 font-medium truncate mt-0.5">{ngo.cause}</p>
                   )}
                 </div>
               </div>
 
               <h2 className="text-sm font-black text-gray-900 mb-1">Make a Difference</h2>
-              <p className="text-xs text-gray-400 mb-4 leading-relaxed">
+              <p className="text-xs text-gray-400 mb-3 leading-relaxed">
                 Support {ngo.name} and help them create lasting impact in your community.
               </p>
 
-              {/* Primary CTA — goes to DonatePage */}
-              <button
-                onClick={() => navigate(`/donate/${ngo._id}`)}
-                className="w-full flex items-center justify-center gap-2 bg-green-600 text-white text-xs font-bold py-3 rounded-xl hover:bg-green-700 active:scale-95 transition-all mb-2"
-              >
-                <Icon name="heart" size={13} />
-                Donate to {ngo.name}
-              </button>
-
-              {/* Scroll to campaigns */}
-              {ngo.campaigns?.length > 0 && (
+              {/* Buttons — tight gap */}
+              <div className="flex flex-col gap-1.5">
                 <button
-                  onClick={() => document.getElementById('campaigns-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="w-full flex items-center justify-center gap-2 text-xs font-semibold text-gray-600 border border-gray-200 py-2.5 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all"
+                  onClick={() => navigate(`/donate/${ngo._id}`)}
+                  className="w-full flex items-center justify-center gap-2 bg-green-600 text-white text-xs font-bold py-2.5 rounded-xl hover:bg-green-700 active:scale-95 transition-all"
                 >
-                  <Icon name="megaphone" size={12} className="text-green-500" />
-                  View {ngo.campaigns.length} Campaign{ngo.campaigns.length !== 1 ? 's' : ''}
+                  <Icon name="heart" size={14} />
+                  Donate to {ngo.name}
                 </button>
-              )}
+
+                {ngo.campaigns?.length > 0 && (
+                  <button
+                    onClick={() => document.getElementById('campaigns-section')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="w-full flex items-center justify-center gap-2 text-xs font-semibold text-gray-600 border border-gray-200 py-2.5 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all"
+                  >
+                    <Icon name="megaphone" size={14} className="text-green-500" />
+                    View {ngo.campaigns.length} Campaign{ngo.campaigns.length !== 1 ? 's' : ''}
+                  </button>
+                )}
+              </div>
 
               {/* Trust badges */}
-              <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
+              <div className="mt-4 pt-3 border-t border-gray-100 space-y-2">
                 {[
                   { icon: 'shield-check', text: 'Verified organization' },
                   { icon: 'lock',         text: 'Secure payment'        },
