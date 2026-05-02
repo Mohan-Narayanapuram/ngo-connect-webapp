@@ -3,19 +3,14 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import API from '../api';
 import Icon from '../components/Icon';
 import Navbar from '../components/Navbar';
-import { useAuth } from '../context/AuthContext';
 
 export default function NgoProfile() {
-  const { id }       = useParams();
-  const { user }     = useAuth();
-  const navigate     = useNavigate();
+  const { id }      = useParams();
+  const navigate    = useNavigate();
 
-  const [ngo,       setNgo]       = useState(null);
-  const [amount,    setAmount]    = useState('');
-  const [msg,       setMsg]       = useState('');
-  const [msgType,   setMsgType]   = useState('');
-  const [loading,   setLoading]   = useState(true);
-  const [slideIdx,  setSlideIdx]  = useState(0);
+  const [ngo,     setNgo]     = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [slideIdx, setSlideIdx] = useState(0);
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -25,14 +20,11 @@ export default function NgoProfile() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Build slides from NGO image + campaign images
+  // Build slides: NGO image + campaign images
   const slides = ngo
     ? [
         ngo.image || `https://picsum.photos/seed/${ngo._id}/1200/300`,
-        ...(ngo.campaigns || [])
-          .filter(c => c.image)
-          .map(c => c.image)
-          .slice(0, 4),
+        ...(ngo.campaigns || []).filter(c => c.image).map(c => c.image).slice(0, 4),
       ]
     : [];
 
@@ -53,25 +45,7 @@ export default function NgoProfile() {
     }, 3500);
   };
 
-  const handleDonate = async () => {
-    if (!user) { navigate('/login'); return; }
-    if (!amount || amount <= 0) { setMsg('Enter a valid amount.'); setMsgType('error'); return; }
-    try {
-      await API.post(
-        '/api/donate',
-        { ngoId: id, amount: Number(amount) },
-        { headers: { Authorization: `Bearer ${user.token}` } }
-      );
-      setMsg('Donation successful. Thank you! 🎉');
-      setMsgType('success');
-      setAmount('');
-    } catch (err) {
-      setMsg(err.response?.data?.message || 'Donation failed.');
-      setMsgType('error');
-    }
-  };
-
-  // ── Loading skeleton ────────────────────────────────────────────────────────
+  // ── Loading skeleton ──────────────────────────────────────────────────────
   if (loading) return (
     <div className="min-h-screen bg-white flex flex-col">
       <Navbar />
@@ -90,7 +64,7 @@ export default function NgoProfile() {
     </div>
   );
 
-  // ── Not found ───────────────────────────────────────────────────────────────
+  // ── Not found ─────────────────────────────────────────────────────────────
   if (!ngo) return (
     <div className="min-h-screen bg-white flex flex-col">
       <Navbar />
@@ -99,15 +73,18 @@ export default function NgoProfile() {
           <Icon name="building-2" size={24} className="text-gray-300" />
         </div>
         <p className="font-bold text-gray-700 text-sm mb-1">NGO not found</p>
-        <p className="text-xs text-gray-400 mb-5">This organization may have been removed or the link is broken.</p>
-        <Link to="/discover" className="text-xs text-green-600 border border-green-200 px-4 py-2 rounded-lg hover:bg-green-50 font-semibold transition-colors">
+        <p className="text-xs text-gray-400 mb-5">
+          This organization may have been removed or the link is broken.
+        </p>
+        <Link
+          to="/discover"
+          className="text-xs text-green-600 border border-green-200 px-4 py-2 rounded-lg hover:bg-green-50 font-semibold transition-colors"
+        >
           Back to listing
         </Link>
       </div>
     </div>
   );
-
-  const PRESETS = [100, 250, 500, 1000];
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -127,7 +104,6 @@ export default function NgoProfile() {
         {/* ── Hero Carousel ── */}
         <div className="w-full h-56 bg-gray-100 relative overflow-hidden rounded-2xl mb-6 group">
 
-          {/* Slides */}
           {slides.map((src, i) => (
             <img
               key={i}
@@ -151,7 +127,7 @@ export default function NgoProfile() {
             </span>
           )}
 
-          {/* Prev / Next arrows — visible on hover */}
+          {/* Prev / Next arrows */}
           {slides.length > 1 && (
             <>
               <button
@@ -234,7 +210,7 @@ export default function NgoProfile() {
             )}
 
             {/* Active Campaigns */}
-            <div className="mb-6">
+            <div className="mb-6" id="campaigns-section">
               <h2 className="text-sm font-black text-gray-900 mb-4 flex items-center gap-2">
                 <Icon name="megaphone" size={14} className="text-green-500" />
                 Active Campaigns
@@ -264,10 +240,15 @@ export default function NgoProfile() {
                         <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-2">{c.title}</h3>
                         <p className="text-xs text-gray-400 mb-3 line-clamp-2 flex-1">{c.description}</p>
                         <div className="w-full bg-gray-100 rounded-full h-1.5 mb-1.5">
-                          <div className="bg-green-500 h-1.5 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+                          <div
+                            className="bg-green-500 h-1.5 rounded-full transition-all duration-500"
+                            style={{ width: `${pct}%` }}
+                          />
                         </div>
                         <div className="flex justify-between text-xs text-gray-400 mb-3">
-                          <span className="font-bold text-gray-800">₹{(c.raised || 0).toLocaleString('en-IN')}</span>
+                          <span className="font-bold text-gray-800">
+                            ₹{(c.raised || 0).toLocaleString('en-IN')}
+                          </span>
                           <span>Goal: ₹{(c.goal || 0).toLocaleString('en-IN')}</span>
                         </div>
                         <button
@@ -286,67 +267,46 @@ export default function NgoProfile() {
 
           </div>
 
-          {/* ── Right column — Donate widget ── */}
+          {/* ── Right column — CTA widget ── */}
           <div className="w-full lg:w-72 flex-shrink-0 sticky top-20">
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
-              <h2 className="text-sm font-black text-gray-900 mb-1">Support {ngo.name}</h2>
+
+              {/* NGO identity summary */}
+              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
+                <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center border border-green-100 flex-shrink-0">
+                  <Icon name="building-2" size={18} className="text-green-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-gray-900 truncate">{ngo.name}</p>
+                  {ngo.cause && (
+                    <p className="text-xs text-green-600 font-medium truncate">{ngo.cause}</p>
+                  )}
+                </div>
+              </div>
+
+              <h2 className="text-sm font-black text-gray-900 mb-1">Make a Difference</h2>
               <p className="text-xs text-gray-400 mb-4 leading-relaxed">
-                Your donation goes directly to {ngo.name}.
+                Support {ngo.name} and help them create lasting impact in your community.
               </p>
 
-              {/* Preset amounts */}
-              <div className="grid grid-cols-2 gap-2 mb-3">
-                {PRESETS.map(p => (
-                  <button key={p} onClick={() => setAmount(String(p))}
-                    className={`text-xs font-bold py-2 rounded-xl border transition-all ${
-                      amount === String(p)
-                        ? 'bg-gray-900 text-white border-gray-900'
-                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:bg-gray-50'
-                    }`}>
-                    ₹{p.toLocaleString('en-IN')}
-                  </button>
-                ))}
-              </div>
+              {/* Primary CTA — goes to DonatePage */}
+              <button
+                onClick={() => navigate(`/donate/${ngo._id}`)}
+                className="w-full flex items-center justify-center gap-2 bg-green-600 text-white text-xs font-bold py-3 rounded-xl hover:bg-green-700 active:scale-95 transition-all mb-2"
+              >
+                <Icon name="heart" size={13} />
+                Donate to {ngo.name}
+              </button>
 
-              {/* Custom amount */}
-              <div className="relative mb-3">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-semibold pointer-events-none">₹</span>
-                <input
-                  type="number" placeholder="Custom amount"
-                  value={amount} onChange={e => setAmount(e.target.value)}
-                  className="w-full pl-7 pr-4 py-2.5 text-xs border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
-                  min="1"
-                />
-              </div>
-
-              {/* Feedback */}
-              {msg && (
-                <div className={`text-xs px-3 py-2 rounded-lg mb-3 font-medium ${
-                  msgType === 'success'
-                    ? 'bg-green-50 text-green-700 border border-green-100'
-                    : 'bg-red-50 text-red-600 border border-red-100'
-                }`}>
-                  {msg}
-                </div>
-              )}
-
-              {user ? (
-                <button onClick={handleDonate}
-                  className="w-full flex items-center justify-center gap-2 bg-green-600 text-white text-xs font-bold py-3 rounded-xl hover:bg-green-700 active:scale-95 transition-all">
-                  <Icon name="heart" size={13} />
-                  Donate Now
+              {/* Scroll to campaigns */}
+              {ngo.campaigns?.length > 0 && (
+                <button
+                  onClick={() => document.getElementById('campaigns-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="w-full flex items-center justify-center gap-2 text-xs font-semibold text-gray-600 border border-gray-200 py-2.5 rounded-xl hover:border-gray-400 hover:bg-gray-50 transition-all"
+                >
+                  <Icon name="megaphone" size={12} className="text-green-500" />
+                  View {ngo.campaigns.length} Campaign{ngo.campaigns.length !== 1 ? 's' : ''}
                 </button>
-              ) : (
-                <div className="text-center">
-                  <p className="text-xs text-gray-400 mb-2">
-                    <Link to="/login" className="text-green-600 font-semibold hover:underline">Sign in</Link>{' '}
-                    required to donate
-                  </p>
-                  <Link to="/login"
-                    className="block w-full text-center text-xs font-bold text-white bg-green-600 py-3 rounded-xl hover:bg-green-700 transition-all">
-                    Sign in to Donate
-                  </Link>
-                </div>
               )}
 
               {/* Trust badges */}
@@ -362,6 +322,7 @@ export default function NgoProfile() {
                   </div>
                 ))}
               </div>
+
             </div>
           </div>
 
