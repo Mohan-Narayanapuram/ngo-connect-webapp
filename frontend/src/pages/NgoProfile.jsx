@@ -282,7 +282,7 @@ export default function NgoProfile() {
                   className="w-full flex items-center justify-center gap-2 bg-green-600 text-white text-xs font-bold py-2.5 rounded-xl hover:bg-green-700 active:scale-95 transition-all"
                 >
                   <Icon name="heart" size={14} />
-                  Donate to {ngo.name}
+                  Donate
                 </button>
 
                 {ngo.campaigns?.length > 0 && (
