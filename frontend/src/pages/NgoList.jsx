@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import API from '../api';
 import Icon from '../components/Icon';
 import Navbar from '../components/Navbar';
 import NgoCard from '../components/NgoCard';

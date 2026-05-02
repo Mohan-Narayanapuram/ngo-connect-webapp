@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import API from '../api';
 import Footer from '../components/Footer';
 import Icon from '../components/Icon';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
-
 
 // ── Animated counter ───────────────────────────────────────────────
 function useCountUp(target, duration = 900) {
