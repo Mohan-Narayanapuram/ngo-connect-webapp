@@ -1,5 +1,6 @@
+import axios from "axios";
 
-const API = API.create({
+const API = axios.create({
   baseURL: "https://ngo-connect-webapp.onrender.com",
 });
 
