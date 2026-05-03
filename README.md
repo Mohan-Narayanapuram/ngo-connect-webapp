@@ -74,7 +74,7 @@ This project follows a standard MERN stack architecture:
 
 ## Project Structure
 
-NGO-Connect-WebApp/
+```NGO-Connect-WebApp/
 
 ├── frontend/  
 │   ├── src/  
@@ -96,7 +96,8 @@ NGO-Connect-WebApp/
 │   ├── seed.js  
 │   └── package.json  
 │  
-└── README.md  
+└── README.md
+```
 
 ---
 
@@ -120,9 +121,11 @@ NGO-Connect-WebApp/
 
 Create a .env file inside the backend/ directory:
 
+``` .env
 MONGO_URI=your_mongodb_connection_string  
 JWT_SECRET=your_secret_key  
-PORT=5000  
+PORT=5000
+```
 
 ---
 
@@ -135,15 +138,19 @@ cd ngo-connect-webapp
 
 Backend Setup:
 
+``` bash
 cd backend  
 npm install  
-npm run dev  
+npm run dev
+```
 
 Frontend Setup:
 
+``` bash
 cd frontend  
 npm install  
-npm run dev  
+npm run dev
+```
 
 ---
 
