@@ -1,12 +1,30 @@
 # NGO Connect Web Application
 
-A full-stack MERN web application that connects donors with NGOs, enabling discovery of organizations, campaign participation, and seamless contribution to social causes.
+A full-stack MERN web application designed to connect donors with verified NGOs across India. The platform enables users to discover organizations, explore campaigns, donate securely (simulated), and track their contributions through a personalized dashboard.
+
+---
+
+## Live Demo
+
+- Frontend (Vercel): https://ngo-connect-webapp.vercel.app  
+- Backend API (Render): https://ngo-connect-webapp.onrender.com  
 
 ---
 
 ## Overview
 
-NGO Connect is designed to bridge the gap between donors and non-governmental organizations through a modern, scalable, and user-friendly platform. The application follows a modular MERN architecture and is built with a strong focus on clean UI/UX based on Figma design.
+NGO Connect bridges the gap between donors and non-governmental organizations through a modern, scalable, and user-friendly platform. The application is built using a modular MERN architecture with a strong focus on performance, maintainability, and clean UI/UX.
+
+---
+
+## Architecture
+
+This project follows a standard MERN stack architecture:
+
+- Frontend: React (Vite) handles UI and client-side routing  
+- Backend: Node.js and Express provide RESTful APIs  
+- Database: MongoDB (via Mongoose) stores application data  
+- Authentication: JWT-based authentication using Bearer tokens  
 
 ---
 
@@ -14,15 +32,19 @@ NGO Connect is designed to bridge the gap between donors and non-governmental or
 
 ### Frontend
 - React (Vite)
+- React Router DOM
+- Axios
 - Tailwind CSS
-- React Router
 
 ### Backend
 - Node.js
 - Express.js
 
 ### Database
-- MongoDB
+- MongoDB (Mongoose)
+
+### Authentication
+- JSON Web Tokens (JWT)
 
 ---
 
@@ -36,142 +58,131 @@ NGO Connect is designed to bridge the gap between donors and non-governmental or
 
 ## Features
 
-- User Authentication (Login and Registration with JWT)
-- NGO Listing with Filters (Location and Cause)
-- Detailed NGO Profile Pages
-- Campaign and Donation Interface (UI)
-- Modular Backend with Controllers, Routes, Middleware
-- MongoDB Database Integration
-- Clean and Responsive UI based on Figma
+- JWT-based authentication (login and registration)
+- Persistent user sessions using token storage
+- Discover NGOs with search and filtering (cause, location)
+- Detailed NGO profiles with campaign listings
+- Campaign-based and general donation flow
+- Simulated multi-method payments (Card, UPI, Netbanking, Wallet)
+- Donor dashboard with donation history and analytics
+- Protected routes with authentication checks
+- Modular backend architecture (MVC pattern)
+- Responsive UI with modern design system
+- RESTful API integration
 
 ---
 
 ## Project Structure
 
-```
 NGO-Connect-WebApp/
-│
-├── backend/
-│   ├── controllers/
-│   │   ├── authController.js
-│   │   ├── donationController.js
-│   │   └── ngoController.js
-│   │
-│   ├── middleware/
-│   │   └── authMiddleware.js
-│   │
-│   ├── models/
-│   │   ├── User.js
-│   │   ├── Ngo.js
-│   │   └── Donation.js
-│   │
-│   ├── routes/
-│   │   ├── authRoutes.js
-│   │   ├── userRoutes.js
-│   │   ├── ngoRoutes.js
-│   │   └── donationRoutes.js
-│   │
-│   ├── server.js
-│   ├── seed.js
-│   ├── package.json
-│   └── .env
-│
-├── frontend/
-│   ├── src/
-│   │   ├── assets/
-│   │   ├── components/
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── NgoCard.jsx
-│   │   │   ├── FilterDropdown.jsx
-│   │   │   └── Icon.jsx
-│   │   │
-│   │   ├── context/
-│   │   │   └── AuthContext.jsx
-│   │   │
-│   │   ├── data/
-│   │   │   └── ngos.js
-│   │   │
-│   │   ├── pages/
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── NgoList.jsx
-│   │   │   ├── NgoProfile.jsx
-│   │   │   ├── DonatePage.jsx
-│   │   │   ├── Login.jsx
-│   │   │   └── Register.jsx
-│   │   │
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
-│   │
-│   ├── index.html
-│   ├── tailwind.config.js
-│   ├── postcss.config.js
-│   ├── vite.config.js
-│   └── package.json
-│
-├── .gitignore
-├── README.md
-└── package.json
-```
+
+├── frontend/  
+│   ├── src/  
+│   │   ├── components/  
+│   │   ├── pages/  
+│   │   ├── context/  
+│   │   ├── assets/  
+│   │   ├── App.jsx  
+│   │   ├── main.jsx  
+│   │   └── index.css  
+│   └── package.json  
+│  
+├── backend/  
+│   ├── models/  
+│   ├── routes/  
+│   ├── controllers/  
+│   ├── middleware/  
+│   ├── server.js  
+│   ├── seed.js  
+│   └── package.json  
+│  
+└── README.md  
+
+---
+
+## API Overview
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /api/auth/register | Register user |
+| POST | /api/auth/login | Login user |
+| GET | /api/ngos | Fetch all NGOs |
+| GET | /api/ngos/:id | Fetch NGO details |
+| POST | /api/donate | Create donation (protected) |
+| GET | /api/users/me | Get user profile |
+| PUT | /api/users/me | Update user profile |
+| PUT | /api/users/password | Change password |
+| GET | /api/users/donations | Get donation history |
+
+---
+
+## Environment Variables
+
+Create a .env file inside the backend/ directory:
+
+MONGO_URI=your_mongodb_connection_string  
+JWT_SECRET=your_secret_key  
+PORT=5000  
 
 ---
 
 ## Installation
 
-### Clone Repository
+Clone Repository:
 
-```
-git clone https://github.com/your-username/ngo-connect-webapp.git
-cd ngo-connect-webapp
-```
+git clone https://github.com/your-username/ngo-connect-webapp.git  
+cd ngo-connect-webapp  
+
+Backend Setup:
+
+cd backend  
+npm install  
+npm run dev  
+
+Frontend Setup:
+
+cd frontend  
+npm install  
+npm run dev  
 
 ---
 
-### Backend Setup
+## Deployment
 
-```
-cd backend
-npm install
-npm run dev
-```
+- Frontend deployed on Vercel  
+- Backend deployed on Render  
+- Database hosted on MongoDB Atlas  
 
----
+API Base URL used in frontend:
 
-### Frontend Setup
-
-```
-cd frontend
-npm install
-npm run dev
-```
+https://ngo-connect-webapp.onrender.com  
 
 ---
 
 ## Current Status
 
-- Frontend UI: Not Fully Completed
-- Routing: Implemented
-- Database: Connected
-- Backend APIs: Partially implemented
-- Authentication: Functional
-- Payment Integration: Pending
+- Core features fully implemented  
+- Frontend and backend successfully deployed  
+- Database connected via MongoDB Atlas  
+- Donation system functional (simulated payments)  
+- Dashboard implemented  
 
 ---
 
 ## Future Enhancements
 
-- Complete API integration between frontend and backend
-- Payment gateway integration (Razorpay/Stripe)
-- User dashboard with analytics
-- NGO verification system
-- Real-time donation tracking
+- Integration with real payment gateways (Razorpay or Stripe)  
+- Email notifications and receipts  
+- NGO registration and verification system  
+- Admin dashboard  
+- Password recovery system  
 
 ---
 
-## Author
+## Authors
 
-- D. Pujith Ram Reddy
-- Mohan Narayanapuram
+- Mohan Narayanapuram  
+- D. Pujith Ram Reddy  
 
 ---
 
