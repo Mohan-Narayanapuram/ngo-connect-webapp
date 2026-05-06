@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import API from '../api';
+import Footer from '../components/Footer';
 import Icon from '../components/Icon';
 import Navbar from '../components/Navbar';
 import NgoCard from '../components/NgoCard';
@@ -26,7 +27,6 @@ function FilterBar({ search, onSearch, causes, selectedCauses, onToggleCause, re
   const debounceRef = useRef(null);
   const hasActiveFilter = selectedCauses.size > 0 || search.trim() !== '';
 
-  // keep inputVal in sync if parent clears search
   useEffect(() => {
     setInputVal(search);
   }, [search]);
@@ -94,7 +94,7 @@ function FilterBar({ search, onSearch, causes, selectedCauses, onToggleCause, re
               onClick={handleClear}
               className="text-xs text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1 flex-shrink-0"
             >
-              <Icon name="circle-X" size={12} />
+              <Icon name="x-circle" size={12} />
               Clear all
             </button>
           )}
@@ -112,7 +112,7 @@ function FilterBar({ search, onSearch, causes, selectedCauses, onToggleCause, re
           </div>
         </div>
 
-        {/* Row 2 — Cause pills (multi-select, horizontally scrollable) */}
+        {/* Row 2 — Cause pills */}
         <div className="relative">
           <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-white to-transparent z-10" />
           <div
@@ -146,17 +146,15 @@ function FilterBar({ search, onSearch, causes, selectedCauses, onToggleCause, re
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function NgoList() {
-  // ── FIX: read ?cause= from URL on mount ──────────────────
   const [searchParams] = useSearchParams();
 
-  const [ngos, setNgos]             = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [search, setSearch]         = useState('');
+  const [ngos, setNgos]         = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [search, setSearch]     = useState('');
   const [selectedCauses, setSelectedCauses] = useState(() => {
-    const causeFromUrl = searchParams.get('cause');
-    return causeFromUrl ? new Set([causeFromUrl]) : new Set();
+    const c = searchParams.get('cause');
+    return c ? new Set([c]) : new Set();
   });
-  // ─────────────────────────────────────────────────────────
 
   useEffect(() => {
     API.get('/api/ngos')
@@ -164,6 +162,12 @@ export default function NgoList() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+
+  // Re-apply URL cause once NGOs have loaded
+  useEffect(() => {
+    const c = searchParams.get('cause');
+    if (c) setSelectedCauses(new Set([c]));
+  }, [ngos]);
 
   const causes = useMemo(
     () => ['All', ...new Set(ngos.map(n => n.cause).filter(Boolean))],
@@ -198,6 +202,9 @@ export default function NgoList() {
     setSearch('');
     setSelectedCauses(new Set());
   };
+
+  // ── Key derived boolean ───────────────────────────────────
+  const hasActiveFilter = selectedCauses.size > 0 || search.trim() !== '';
 
   return (
     <div className="min-h-screen bg-white w-full flex flex-col">
@@ -235,9 +242,42 @@ export default function NgoList() {
       {/* ── Main content ── */}
       <div className="flex-1 max-w-5xl mx-auto w-full px-6 lg:px-10 py-10">
 
-        {/* Active Campaigns */}
-        {!loading && allCampaigns.length > 0 && (
-          <section className="mb-12" id="campaigns">
+        {/* ── NGO Grid — always first ── */}
+        <section>
+          <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100">
+            <Icon name="map-pin" size={13} className="text-green-500 flex-shrink-0" />
+            <h2 className="text-xs font-black text-gray-600 uppercase tracking-widest">Local Organizations</h2>
+            <span className="text-xs text-gray-300 hidden sm:inline">· Verified NGOs making an impact in your community</span>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1,2,3,4,5,6].map(i => <SkeletonCard key={i} />)}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex flex-col items-center py-24 text-center">
+              <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+                <Icon name="search-x" size={24} className="text-gray-300" />
+              </div>
+              <p className="font-bold text-gray-700 text-sm">No NGOs found</p>
+              <p className="text-xs text-gray-400 mt-1 mb-5">Try adjusting your search or filter.</p>
+              <button
+                onClick={handleClear}
+                className="text-xs text-green-600 border border-green-200 px-4 py-2 rounded-lg hover:bg-green-50 font-semibold transition-colors"
+              >
+                Clear filters
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filtered.map(ngo => <NgoCard key={ngo._id} ngo={ngo} />)}
+            </div>
+          )}
+        </section>
+
+        {/* ── Active Campaigns — only when NO filter active ── */}
+        {!loading && !hasActiveFilter && allCampaigns.length > 0 && (
+          <section className="mt-16" id="campaigns">
             <div className="mb-5">
               <h2 className="text-base font-black text-gray-900">Active Campaigns</h2>
               <p className="text-xs text-green-600 font-medium mt-0.5">Support ongoing initiatives that need your help</p>
@@ -280,40 +320,7 @@ export default function NgoList() {
           </section>
         )}
 
-        {/* NGO Grid */}
-        <section>
-          <div className="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100">
-            <Icon name="map-pin" size={13} className="text-green-500 flex-shrink-0" />
-            <h2 className="text-xs font-black text-gray-600 uppercase tracking-widest">Local Organizations</h2>
-            <span className="text-xs text-gray-300 hidden sm:inline">· Verified NGOs making an impact in your community</span>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1,2,3,4,5,6].map(i => <SkeletonCard key={i} />)}
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center py-24 text-center">
-              <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
-                <Icon name="search-x" size={24} className="text-gray-300" />
-              </div>
-              <p className="font-bold text-gray-700 text-sm">No NGOs found</p>
-              <p className="text-xs text-gray-400 mt-1 mb-5">Try adjusting your search or filter.</p>
-              <button
-                onClick={handleClear}
-                className="text-xs text-green-600 border border-green-200 px-4 py-2 rounded-lg hover:bg-green-50 font-semibold transition-colors"
-              >
-                Clear filters
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map(ngo => <NgoCard key={ngo._id} ngo={ngo} />)}
-            </div>
-          )}
-        </section>
-
-        {/* Are you an NGO? CTA */}
+        {/* ── Are you an NGO? CTA ── */}
         {!loading && (
           <section className="mt-16 bg-gray-50 border border-gray-100 rounded-2xl p-10 text-center">
             <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -323,8 +330,10 @@ export default function NgoList() {
             <p className="text-gray-400 text-sm mb-6 max-w-md mx-auto leading-relaxed">
               Join NGO Connect to increase your visibility, manage campaigns, and connect with donors who care about your cause.
             </p>
-            <Link to="/register"
-              className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-green-700 active:scale-95 transition-all">
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-green-700 active:scale-95 transition-all"
+            >
               <Icon name="circle-plus" size={16} />
               Register Your Organization
             </Link>
@@ -332,50 +341,7 @@ export default function NgoList() {
         )}
       </div>
 
-      {/* ── Footer ── */}
-      <footer className="bg-white border-t border-gray-100 mt-8">
-        <div className="max-w-5xl mx-auto px-6 lg:px-10 py-10">
-          <div className="flex flex-col md:flex-row justify-between gap-10">
-            <div className="max-w-xs">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 bg-green-600 rounded-lg flex items-center justify-center">
-                  <Icon name="heart-handshake" size={14} className="text-white" />
-                </div>
-                <span className="font-bold text-gray-900">NGO Connect</span>
-              </div>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Connecting donors with local NGOs to create meaningful impact. Transparent, accessible, and community-driven.
-              </p>
-            </div>
-            <div className="flex gap-16 text-xs">
-              <div>
-                <p className="font-bold text-gray-700 mb-3 uppercase tracking-widest text-xs">Platform</p>
-                <ul className="space-y-2 text-gray-400">
-                  <li><Link to="/discover" className="hover:text-gray-700 transition-colors">Discover NGOs</Link></li>
-                  <li><a href="#campaigns" className="hover:text-gray-700 transition-colors">Active Campaigns</a></li>
-                  <li><Link to="/about" className="hover:text-gray-700 transition-colors">How It Works</Link></li>
-                </ul>
-              </div>
-              <div>
-                <p className="font-bold text-gray-700 mb-3 uppercase tracking-widest text-xs">Support</p>
-                <ul className="space-y-2 text-gray-400">
-                  <li><Link to="/contact" className="hover:text-gray-700 transition-colors">Help Center</Link></li>
-                  <li><Link to="/contact" className="hover:text-gray-700 transition-colors">Contact Us</Link></li>
-                  <li><Link to="/register" className="hover:text-gray-700 transition-colors">For NGOs</Link></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row justify-between text-xs text-gray-300 gap-2">
-            <span>© 2026 NGO Connect. All rights reserved.</span>
-            <div className="flex gap-4">
-              <Link to="/privacy" className="hover:text-gray-500 transition-colors">Privacy Policy</Link>
-              <Link to="/terms" className="hover:text-gray-500 transition-colors">Terms of Service</Link>
-              <a href="#" className="hover:text-gray-500 transition-colors">Cookie Policy</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
