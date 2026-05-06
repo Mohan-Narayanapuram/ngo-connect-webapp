@@ -37,7 +37,6 @@ export default function Navbar() {
 
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
-  // Lock body scroll when mobile menu open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
@@ -89,12 +88,7 @@ export default function Navbar() {
             {/* ── Desktop Right ── */}
             <div className="hidden md:flex items-center gap-2">
               {user ? (
-                <div
-                  className="relative"
-                  ref={dropdownRef}
-                  onMouseEnter={() => setDropdownOpen(true)}
-                  onMouseLeave={() => setDropdownOpen(false)}
-                >
+                <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setDropdownOpen(o => !o)}
                     className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
@@ -111,7 +105,7 @@ export default function Navbar() {
                     />
                   </button>
 
-                  {/* ── Dropdown — smooth fade + slide ── */}
+                  {/* ── Dropdown — click only, smooth fade + slide ── */}
                   <div className={`absolute right-0 top-full pt-1 w-52 z-50 transition-all duration-200 origin-top-right ${
                     dropdownOpen
                       ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
@@ -173,7 +167,6 @@ export default function Navbar() {
                 className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
                 aria-label="Toggle menu"
               >
-                {/* Animated hamburger → X */}
                 <div className="relative w-[18px] h-[18px]">
                   <Icon
                     name="menu" size={18}
@@ -210,8 +203,10 @@ export default function Navbar() {
             {user ? (
               <>
                 <div className="h-px bg-gray-100 my-2" />
-                <div className={`flex items-center gap-3 px-3 py-2 transition-all duration-200 ${mobileOpen ? 'translate-x-0 opacity-100' : '-translate-x-3 opacity-0'}`}
-                  style={{ transitionDelay: mobileOpen ? '120ms' : '0ms' }}>
+                <div
+                  className={`flex items-center gap-3 px-3 py-2 transition-all duration-200 ${mobileOpen ? 'translate-x-0 opacity-100' : '-translate-x-3 opacity-0'}`}
+                  style={{ transitionDelay: mobileOpen ? '120ms' : '0ms' }}
+                >
                   <div className="w-8 h-8 rounded-lg bg-green-600 flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-xs font-bold">{initials}</span>
                   </div>
