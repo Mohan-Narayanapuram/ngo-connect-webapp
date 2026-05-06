@@ -5,8 +5,8 @@ import Icon from '../components/Icon';
 import Navbar from '../components/Navbar';
 
 export default function NgoProfile() {
-  const { id }     = useParams();
-  const navigate   = useNavigate();
+  const { id }   = useParams();
+  const navigate = useNavigate();
 
   const [ngo,      setNgo]      = useState(null);
   const [loading,  setLoading]  = useState(true);
@@ -88,9 +88,9 @@ export default function NgoProfile() {
 
       <div className="max-w-5xl mx-auto w-full px-6 lg:px-10">
 
-        {/* ── Back button ── */}
+        {/* ── Back button — always goes to /discover ── */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/discover')}
           className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-gray-700 transition-colors mt-6 mb-4 group"
         >
           <Icon name="arrow-left" size={13} className="group-hover:-translate-x-0.5 transition-transform" />
@@ -125,14 +125,12 @@ export default function NgoProfile() {
               <button
                 onClick={() => goTo((slideIdx - 1 + slides.length) % slides.length)}
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
-                aria-label="Previous image"
               >
                 <Icon name="chevron-left" size={14} className="text-gray-700" />
               </button>
               <button
                 onClick={() => goTo((slideIdx + 1) % slides.length)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
-                aria-label="Next image"
               >
                 <Icon name="chevron-right" size={14} className="text-gray-700" />
               </button>
@@ -145,7 +143,6 @@ export default function NgoProfile() {
                 <button
                   key={i}
                   onClick={() => goTo(i)}
-                  aria-label={`Go to slide ${i + 1}`}
                   className={`rounded-full transition-all duration-300 ${
                     i === slideIdx ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/50 hover:bg-white/80'
                   }`}
@@ -238,7 +235,9 @@ export default function NgoProfile() {
                           <span>Goal: ₹{(c.goal || 0).toLocaleString('en-IN')}</span>
                         </div>
                         <button
-                          onClick={() => navigate(`/donate/${ngo._id}/${c._id}`)}
+                          onClick={() => navigate(`/donate/${ngo._id}/${c._id}`, {
+                            state: { from: `/ngo/${ngo._id}` }
+                          })}
                           className="w-full flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-green-600 py-2 rounded-lg hover:bg-green-700 active:scale-95 transition-all"
                         >
                           <Icon name="heart" size={12} />
@@ -250,14 +249,12 @@ export default function NgoProfile() {
                 </div>
               )}
             </div>
-
           </div>
 
           {/* ── Right column — CTA widget ── */}
           <div className="w-full lg:w-72 flex-shrink-0 sticky top-20">
             <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
 
-              {/* NGO identity summary — tighter, bigger icon */}
               <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-100">
                 <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center border border-green-100 flex-shrink-0">
                   <Icon name="building-2" size={22} className="text-green-600" />
@@ -275,10 +272,11 @@ export default function NgoProfile() {
                 Support {ngo.name} and help them create lasting impact in your community.
               </p>
 
-              {/* Buttons — tight gap */}
               <div className="flex flex-col gap-1.5">
                 <button
-                  onClick={() => navigate(`/donate/${ngo._id}`)}
+                  onClick={() => navigate(`/donate/${ngo._id}`, {
+                    state: { from: `/ngo/${ngo._id}` }
+                  })}
                   className="w-full flex items-center justify-center gap-2 bg-green-600 text-white text-xs font-bold py-2.5 rounded-xl hover:bg-green-700 active:scale-95 transition-all"
                 >
                   <Icon name="heart" size={14} />
@@ -296,7 +294,6 @@ export default function NgoProfile() {
                 )}
               </div>
 
-              {/* Trust badges */}
               <div className="mt-4 pt-3 border-t border-gray-100 space-y-2">
                 {[
                   { icon: 'shield-check', text: 'Verified organization' },
@@ -309,10 +306,8 @@ export default function NgoProfile() {
                   </div>
                 ))}
               </div>
-
             </div>
           </div>
-
         </div>
       </div>
     </div>

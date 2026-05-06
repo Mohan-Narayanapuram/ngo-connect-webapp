@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import API from '../api';
 import Footer from '../components/Footer';
 import Icon from '../components/Icon';
@@ -7,10 +7,10 @@ import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 
 const METHODS = [
-  { id: 'card',       icon: 'credit-card',  label: 'Credit / Debit Card' },
-  { id: 'upi',        icon: 'smartphone',   label: 'UPI' },
-  { id: 'netbanking', icon: 'landmark',     label: 'Net Banking' },
-  { id: 'wallet',     icon: 'wallet',       label: 'Wallet' },
+  { id: 'card',       icon: 'credit-card', label: 'Credit / Debit Card' },
+  { id: 'upi',        icon: 'smartphone',  label: 'UPI'                 },
+  { id: 'netbanking', icon: 'landmark',    label: 'Net Banking'         },
+  { id: 'wallet',     icon: 'wallet',      label: 'Wallet'              },
 ];
 
 const AMOUNTS = [100, 250, 500, 1000, 2500, 5000];
@@ -19,6 +19,10 @@ export default function DonatePage() {
   const { ngoId, campaignId } = useParams();
   const { user }    = useAuth();
   const navigate    = useNavigate();
+  const location    = useLocation();
+
+  // If came from NgoProfile, go back there. Otherwise fallback to /ngo/:id
+  const backTo = location.state?.from || `/ngo/${ngoId}`;
 
   const [ngo, setNgo]               = useState(null);
   const [campaign, setCampaign]     = useState(null);
@@ -26,7 +30,7 @@ export default function DonatePage() {
   const [amount, setAmount]         = useState('');
   const [custom, setCustom]         = useState(false);
   const [method, setMethod]         = useState('card');
-  const [step, setStep]             = useState(1); // 1=amount, 2=payment, 3=success
+  const [step, setStep]             = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState('');
 
@@ -95,11 +99,14 @@ export default function DonatePage() {
 
       <div className="max-w-4xl mx-auto px-6 py-8">
 
-        <Link to={`/ngo/${ngoId}`}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-800 mb-6 transition-colors">
-          <Icon name="arrow-left" size={15} />
+        {/* ── Back button — goes to NgoProfile, never loops ── */}
+        <button
+          onClick={() => navigate(backTo)}
+          className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-800 mb-6 transition-colors group"
+        >
+          <Icon name="arrow-left" size={15} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to {ngo?.name}
-        </Link>
+        </button>
 
         {/* Donation context banner */}
         <div className={`mb-6 px-4 py-3 rounded-xl border flex items-center gap-3 text-sm ${
@@ -143,7 +150,6 @@ export default function DonatePage() {
                   <Icon name="map-pin" size={11} /> {ngo?.location}
                 </p>
 
-                {/* Campaign details */}
                 {campaign ? (
                   <div className="mt-4 pt-4 border-t border-gray-100">
                     <div className="flex items-center gap-1.5 mb-2">
@@ -155,14 +161,14 @@ export default function DonatePage() {
                       <p className="text-xs text-gray-400 mb-3 leading-relaxed line-clamp-2">{campaign.description}</p>
                     )}
                     <div className="flex justify-between text-xs text-gray-400 mb-1">
-                      <span>Rs. {(campaign.raised || 0).toLocaleString()} raised</span>
+                      <span>₹{(campaign.raised || 0).toLocaleString('en-IN')} raised</span>
                       <span>{pct}%</span>
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-1.5">
                       <div className="bg-green-500 h-1.5 rounded-full" style={{ width: `${pct}%` }} />
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
-                      Goal: Rs. {(campaign.goal || 0).toLocaleString()}
+                      Goal: ₹{(campaign.goal || 0).toLocaleString('en-IN')}
                     </p>
                   </div>
                 ) : (
@@ -176,7 +182,6 @@ export default function DonatePage() {
               </div>
             </div>
 
-            {/* Security note */}
             <div className="bg-green-50 border border-green-100 rounded-xl p-4">
               <div className="flex items-start gap-3">
                 <Icon name="shield-check" size={16} className="text-green-600 flex-shrink-0 mt-0.5" />
@@ -194,16 +199,15 @@ export default function DonatePage() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
 
-              {/* Success screen */}
               {step === 3 ? (
                 <div className="flex flex-col items-center py-8 text-center">
                   <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
                     <Icon name="circle-check" size={40} className="text-green-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Thank you, {user?.name}! </h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Thank you, {user?.name}! 🎉</h2>
                   <p className="text-gray-400 mb-1">
                     Your donation of{' '}
-                    <span className="font-bold text-green-600">Rs. {Number(amount).toLocaleString()}</span>
+                    <span className="font-bold text-green-600">₹{Number(amount).toLocaleString('en-IN')}</span>
                     {campaign ? (
                       <> to <span className="font-semibold text-gray-700">{campaign.title}</span></>
                     ) : (
@@ -256,9 +260,7 @@ export default function DonatePage() {
                     <div>
                       <h2 className="text-xl font-bold text-gray-900 mb-1">Choose amount</h2>
                       <p className="text-sm text-gray-400 mb-6">
-                        {campaign
-                          ? `Supporting: ${campaign.title}`
-                          : `Donating to: ${ngo?.name}`}
+                        {campaign ? `Supporting: ${campaign.title}` : `Donating to: ${ngo?.name}`}
                       </p>
 
                       <div className="grid grid-cols-3 gap-3 mb-5">
@@ -310,7 +312,7 @@ export default function DonatePage() {
                     <div>
                       <h2 className="text-xl font-bold text-gray-900 mb-1">Payment method</h2>
                       <p className="text-sm text-gray-400 mb-6">
-                        Donating <span className="font-bold text-green-600">₹{Number(amount).toLocaleString()}</span>
+                        Donating <span className="font-bold text-green-600">₹{Number(amount).toLocaleString('en-IN')}</span>
                         {campaign ? <> to <span className="font-medium text-gray-700">{campaign.title}</span></> : ''}
                       </p>
 
@@ -384,7 +386,7 @@ export default function DonatePage() {
                           ) : (
                             <>
                               <Icon name="heart" size={15} />
-                              Donate ₹{Number(amount).toLocaleString()}
+                              Donate ₹{Number(amount).toLocaleString('en-IN')}
                             </>
                           )}
                         </button>
