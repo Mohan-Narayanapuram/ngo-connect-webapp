@@ -1,3 +1,5 @@
+// LegalCookies.jsx
+
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 
@@ -17,8 +19,9 @@ export default function CookiePolicy() {
         {/* Academic notice */}
         <div className="bg-amber-50 border border-amber-100 rounded-xl px-5 py-4 mb-10">
           <p className="text-xs text-amber-700 leading-relaxed">
-            <span className="font-bold">Academic Project Notice:</span> This platform uses minimal browser storage
-            strictly for authentication purposes. No advertising or tracking cookies are used.
+            <span className="font-bold">Academic Project Notice:</span> NGOConnect uses minimal browser storage
+            and authentication tokens required for core platform functionality.
+            The platform does not use advertising, behavioural tracking, or third-party marketing cookies.
           </p>
         </div>
 
@@ -36,10 +39,11 @@ export default function CookiePolicy() {
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-2">2. How We Use Storage</h2>
             <p className="text-sm leading-relaxed mb-4">
-              NGOConnect uses <span className="font-semibold text-gray-800">in-memory session state</span> and{' '}
-              <span className="font-semibold text-gray-800">JSON Web Tokens (JWT)</span> for authentication.
-              Here is a breakdown of what is stored:
+              NGOConnect uses browser storage and JSON Web Tokens (JWT) to maintain authenticated user sessions
+              and support essential application functionality.
+              The platform uses only the minimum storage required for operation.
             </p>
+
             <div className="overflow-hidden rounded-xl border border-gray-100">
               <table className="w-full text-xs">
                 <thead>
@@ -49,10 +53,11 @@ export default function CookiePolicy() {
                     <th className="text-left px-4 py-2.5 font-bold text-gray-700">Duration</th>
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-gray-50">
                   {[
-                    ['JWT Auth Token', 'Keeps you logged in across page refreshes', 'Session / until logout'],
-                    ['React State', 'Holds UI state (filters, modals, form values)', 'Page session only'],
+                    ['JWT Auth Token', 'Maintains authenticated user sessions', 'Until logout or session expiry'],
+                    ['Browser Storage', 'Stores essential frontend state and session data', 'Session / temporary'],
                   ].map(([type, purpose, duration], i) => (
                     <tr key={i} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 font-semibold text-gray-800">{type}</td>
@@ -67,6 +72,7 @@ export default function CookiePolicy() {
 
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-2">3. What We Do NOT Use</h2>
+
             <ul className="space-y-1.5 text-sm list-none pl-0">
               {[
                 'No advertising or marketing cookies',
@@ -84,23 +90,41 @@ export default function CookiePolicy() {
 
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-2">4. Managing Storage</h2>
+
             <p className="text-sm leading-relaxed">
-              You can clear all stored data by logging out of NGOConnect or clearing your browser's
-              local storage and cookies from your browser settings. This will sign you out of the platform.
+              Users can clear stored authentication and session data at any time by logging out of the platform
+              or clearing browser storage and cookies through their browser settings.
+              Clearing this data may sign the user out of the application.
             </p>
           </section>
 
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-2">5. Contact</h2>
+
             <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm space-y-1">
-              <p><span className="font-semibold text-gray-700">Mohan Narayanapuram (RA2311056010126)</span> · <span className="text-gray-400">SRM IST, Kattankulathur</span></p>
-              <p><span className="font-semibold text-gray-700">D. Pujith Ram Reddy (RA2311056010153)</span> · <span className="text-gray-400">SRM IST, Kattankulathur</span></p>
-              <p className="text-gray-400 text-xs mt-2">Course: Full Stack Development (21CSS301T) · Faculty: Dr. Varun P (103189)</p>
+              <p>
+                <span className="font-semibold text-gray-700">
+                  Mohan Narayanapuram (RA2311056010126)
+                </span>{' '}
+                · <span className="text-gray-400">SRM IST, Kattankulathur</span>
+              </p>
+
+              <p>
+                <span className="font-semibold text-gray-700">
+                  D. Pujith Ram Reddy (RA2311056010153)
+                </span>{' '}
+                · <span className="text-gray-400">SRM IST, Kattankulathur</span>
+              </p>
+
+              <p className="text-gray-400 text-xs mt-2">
+                Course: Full Stack Development (21CSS301T) · Faculty: Dr. Varun P (103189)
+              </p>
             </div>
           </section>
 
         </div>
       </main>
+
       <Footer />
     </div>
   );
