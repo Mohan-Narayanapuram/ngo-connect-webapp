@@ -149,7 +149,7 @@ export default function PrivacyPolicy() {
                 </p>
 
                 <p className="text-gray-400">
-                  SRM Institute of Science and Technology, Kattankulathur
+                  SRM IST, Kattankulathur
                 </p>
               </div>
 
@@ -159,7 +159,7 @@ export default function PrivacyPolicy() {
                 </p>
 
                 <p className="text-gray-400">
-                  SRM Institute of Science and Technology, Kattankulathur
+                  SRM IST, Kattankulathur
                 </p>
               </div>
 
