@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import API from '../api';
 import Icon from '../components/Icon';
 import Navbar from '../components/Navbar';
@@ -25,6 +25,11 @@ function FilterBar({ search, onSearch, causes, selectedCauses, onToggleCause, re
   const [inputVal, setInputVal] = useState(search);
   const debounceRef = useRef(null);
   const hasActiveFilter = selectedCauses.size > 0 || search.trim() !== '';
+
+  // keep inputVal in sync if parent clears search
+  useEffect(() => {
+    setInputVal(search);
+  }, [search]);
 
   const handleInput = (val) => {
     setInputVal(val);
@@ -89,7 +94,7 @@ function FilterBar({ search, onSearch, causes, selectedCauses, onToggleCause, re
               onClick={handleClear}
               className="text-xs text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1 flex-shrink-0"
             >
-              <Icon name="filter-x" size={12} />
+              <Icon name="circle-X" size={12} />
               Clear all
             </button>
           )}
@@ -141,10 +146,17 @@ function FilterBar({ search, onSearch, causes, selectedCauses, onToggleCause, re
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function NgoList() {
-  const [ngos, setNgos]                   = useState([]);
-  const [loading, setLoading]             = useState(true);
-  const [search, setSearch]               = useState('');
-  const [selectedCauses, setSelectedCauses] = useState(new Set());
+  // ── FIX: read ?cause= from URL on mount ──────────────────
+  const [searchParams] = useSearchParams();
+
+  const [ngos, setNgos]             = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [search, setSearch]         = useState('');
+  const [selectedCauses, setSelectedCauses] = useState(() => {
+    const causeFromUrl = searchParams.get('cause');
+    return causeFromUrl ? new Set([causeFromUrl]) : new Set();
+  });
+  // ─────────────────────────────────────────────────────────
 
   useEffect(() => {
     API.get('/api/ngos')
@@ -313,7 +325,7 @@ export default function NgoList() {
             </p>
             <Link to="/register"
               className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-green-700 active:scale-95 transition-all">
-              <Icon name="plus-circle" size={16} />
+              <Icon name="circle-plus" size={16} />
               Register Your Organization
             </Link>
           </section>

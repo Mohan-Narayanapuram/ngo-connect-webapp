@@ -13,21 +13,19 @@ export default function Navbar() {
   const { user, logout }    = useAuth();
   const navigate            = useNavigate();
   const location            = useLocation();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled]     = useState(false);
+  const [mobileOpen, setMobileOpen]     = useState(false);
+  const [scrolled, setScrolled]         = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const isActive = (path) => location.pathname === path;
 
-  // Scroll shadow
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target))
@@ -37,8 +35,13 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+
+  // Lock body scroll when mobile menu open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
 
   const handleLogout = () => {
     logout();
@@ -66,7 +69,7 @@ export default function Navbar() {
               </span>
             </Link>
 
-            {/* ── Desktop Nav Links ── */}
+            {/* ── Desktop Nav ── */}
             <nav className="hidden md:flex items-center gap-1">
               {NAV_LINKS.map(({ path, label }) => (
                 <Link key={path} to={path}
@@ -83,7 +86,7 @@ export default function Navbar() {
               ))}
             </nav>
 
-            {/* ── Desktop Right Section ── */}
+            {/* ── Desktop Right ── */}
             <div className="hidden md:flex items-center gap-2">
               {user ? (
                 <div
@@ -95,9 +98,7 @@ export default function Navbar() {
                   <button
                     onClick={() => setDropdownOpen(o => !o)}
                     className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
-                    aria-label="Account menu"
                   >
-                    {/* Circle avatar */}
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0 shadow-sm">
                       <span className="text-white text-xs font-black leading-none">{initials}</span>
                     </div>
@@ -105,54 +106,45 @@ export default function Navbar() {
                       Hi, {user.name.split(' ')[0]}
                     </span>
                     <Icon
-                      name="chevron-down"
-                      size={12}
-                      className={`text-gray-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                      name="chevron-down" size={12}
+                      className={`text-gray-400 transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`}
                     />
                   </button>
 
-                  {/* Dropdown */}
-                  {dropdownOpen && (
-                    <div className="absolute right-0 top-full pt-1 w-52 z-50">
-                      {/* invisible bridge so hover doesn't gap-out */}
-                      <div className="bg-white rounded-xl border border-gray-100 shadow-lg overflow-hidden fade-in">
-                        {/* User info */}
-                        <div className="px-4 py-3 border-b border-gray-50">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0">
-                              <span className="text-white text-xs font-black">{initials}</span>
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-xs font-black text-gray-900 truncate">{user.name}</p>
-                              <p className="text-xs text-gray-400 truncate">{user.email}</p>
-                            </div>
+                  {/* ── Dropdown — smooth fade + slide ── */}
+                  <div className={`absolute right-0 top-full pt-1 w-52 z-50 transition-all duration-200 origin-top-right ${
+                    dropdownOpen
+                      ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto'
+                      : 'opacity-0 scale-95 -translate-y-1 pointer-events-none'
+                  }`}>
+                    <div className="bg-white rounded-xl border border-gray-100 shadow-lg overflow-hidden">
+                      <div className="px-4 py-3 border-b border-gray-50">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0">
+                            <span className="text-white text-xs font-black">{initials}</span>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-black text-gray-900 truncate">{user.name}</p>
+                            <p className="text-xs text-gray-400 truncate">{user.email}</p>
                           </div>
                         </div>
-
-                        {/* Menu items */}
-                        <div className="p-1">
-                          <Link
-                            to="/dashboard"
-                            onClick={() => setDropdownOpen(false)}
-                            className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
-                          >
-                            <Icon name="layout-dashboard" size={14} className="text-gray-400" />
-                            My Dashboard
-                          </Link>
-                        </div>
-
-                        <div className="p-1 border-t border-gray-50">
-                          <button
-                            onClick={handleLogout}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                          >
-                            <Icon name="log-out" size={14} />
-                            Sign Out
-                          </button>
-                        </div>
+                      </div>
+                      <div className="p-1">
+                        <Link to="/dashboard" onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                          <Icon name="layout-dashboard" size={14} className="text-gray-400" />
+                          My Dashboard
+                        </Link>
+                      </div>
+                      <div className="p-1 border-t border-gray-50">
+                        <button onClick={handleLogout}
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                          <Icon name="log-out" size={14} />
+                          Sign Out
+                        </button>
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               ) : (
                 <>
@@ -169,7 +161,7 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* ── Mobile: right side ── */}
+            {/* ── Mobile Right ── */}
             <div className="flex md:hidden items-center gap-2">
               {user && (
                 <div className="w-7 h-7 rounded-lg bg-green-600 flex items-center justify-center">
@@ -179,71 +171,86 @@ export default function Navbar() {
               <button
                 onClick={() => setMobileOpen(o => !o)}
                 className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
-                aria-label="Toggle menu">
-                <Icon name={mobileOpen ? 'x' : 'menu'} size={18} className="text-gray-600" />
+                aria-label="Toggle menu"
+              >
+                {/* Animated hamburger → X */}
+                <div className="relative w-[18px] h-[18px]">
+                  <Icon
+                    name="menu" size={18}
+                    className={`absolute inset-0 text-gray-600 transition-all duration-200 ${mobileOpen ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'}`}
+                  />
+                  <Icon
+                    name="x" size={18}
+                    className={`absolute inset-0 text-gray-600 transition-all duration-200 ${mobileOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'}`}
+                  />
+                </div>
               </button>
             </div>
-
           </div>
         </div>
 
-        {/* ── Mobile Menu ── */}
-        {mobileOpen && (
-          <div className="md:hidden border-t border-gray-100 bg-white">
-            <div className="max-w-6xl mx-auto px-4 py-3 space-y-1">
+        {/* ── Mobile Menu — smooth slide down ── */}
+        <div className={`md:hidden border-t border-gray-100 bg-white overflow-hidden transition-all duration-300 ease-in-out ${
+          mobileOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+        }`}>
+          <div className="max-w-6xl mx-auto px-4 py-3 space-y-1">
+            {NAV_LINKS.map(({ path, label }, i) => (
+              <Link key={path} to={path}
+                className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  isActive(path)
+                    ? 'bg-gray-100 text-gray-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                } ${mobileOpen ? 'translate-x-0 opacity-100' : '-translate-x-3 opacity-0'}`}
+                style={{ transitionDelay: mobileOpen ? `${i * 40}ms` : '0ms' }}
+              >
+                {label}
+              </Link>
+            ))}
 
-              {NAV_LINKS.map(({ path, label }) => (
-                <Link key={path} to={path}
-                  className={`flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-                    isActive(path)
-                      ? 'bg-gray-100 text-gray-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}>
-                  {label}
-                </Link>
-              ))}
-
-              {user ? (
-                <>
-                  <div className="h-px bg-gray-100 my-2" />
-                  {/* User info */}
-                  <div className="flex items-center gap-3 px-3 py-2">
-                    <div className="w-8 h-8 rounded-lg bg-green-600 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white text-xs font-bold">{initials}</span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900">{user.name}</p>
-                      <p className="text-xs text-gray-400">{user.email}</p>
-                    </div>
+            {user ? (
+              <>
+                <div className="h-px bg-gray-100 my-2" />
+                <div className={`flex items-center gap-3 px-3 py-2 transition-all duration-200 ${mobileOpen ? 'translate-x-0 opacity-100' : '-translate-x-3 opacity-0'}`}
+                  style={{ transitionDelay: mobileOpen ? '120ms' : '0ms' }}>
+                  <div className="w-8 h-8 rounded-lg bg-green-600 flex items-center justify-center flex-shrink-0">
+                    <span className="text-white text-xs font-bold">{initials}</span>
                   </div>
-                  <Link to="/dashboard"
-                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
-                    <Icon name="layout-dashboard" size={15} className="text-gray-400" />
-                    Dashboard
-                  </Link>
-                  <button onClick={handleLogout}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                    <Icon name="log-out" size={15} />
-                    Sign Out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <div className="h-px bg-gray-100 my-2" />
-                  <Link to="/login"
-                    className="flex items-center px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
-                    Sign In
-                  </Link>
-                  <Link to="/register"
-                    className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
-                    Get Started
-                    <Icon name="arrow-right" size={13} />
-                  </Link>
-                </>
-              )}
-            </div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900">{user.name}</p>
+                    <p className="text-xs text-gray-400">{user.email}</p>
+                  </div>
+                </div>
+                <Link to="/dashboard"
+                  className={`flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-200 ${mobileOpen ? 'translate-x-0 opacity-100' : '-translate-x-3 opacity-0'}`}
+                  style={{ transitionDelay: mobileOpen ? '160ms' : '0ms' }}>
+                  <Icon name="layout-dashboard" size={15} className="text-gray-400" />
+                  Dashboard
+                </Link>
+                <button onClick={handleLogout}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 ${mobileOpen ? 'translate-x-0 opacity-100' : '-translate-x-3 opacity-0'}`}
+                  style={{ transitionDelay: mobileOpen ? '200ms' : '0ms' }}>
+                  <Icon name="log-out" size={15} />
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="h-px bg-gray-100 my-2" />
+                <Link to="/login"
+                  className={`flex items-center px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-200 ${mobileOpen ? 'translate-x-0 opacity-100' : '-translate-x-3 opacity-0'}`}
+                  style={{ transitionDelay: mobileOpen ? '120ms' : '0ms' }}>
+                  Sign In
+                </Link>
+                <Link to="/register"
+                  className={`flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-all duration-200 ${mobileOpen ? 'translate-x-0 opacity-100' : '-translate-x-3 opacity-0'}`}
+                  style={{ transitionDelay: mobileOpen ? '160ms' : '0ms' }}>
+                  Get Started
+                  <Icon name="arrow-right" size={13} />
+                </Link>
+              </>
+            )}
           </div>
-        )}
+        </div>
       </header>
     </>
   );

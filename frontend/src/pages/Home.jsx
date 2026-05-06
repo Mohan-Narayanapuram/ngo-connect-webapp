@@ -1,198 +1,430 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Icon from '../components/Icon';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 
+/* ─── data ──────────────────────────────────────────────── */
 const CAUSES = [
-    { label: 'Education',   icon: 'book-open',   bg: 'bg-blue-50',   text: 'text-blue-600',   ring: 'hover:ring-blue-200'   },
-    { label: 'Healthcare',  icon: 'heart-pulse',  bg: 'bg-red-50',    text: 'text-red-500',    ring: 'hover:ring-red-200'    },
-    { label: 'Environment', icon: 'leaf',         bg: 'bg-green-50',  text: 'text-green-600',  ring: 'hover:ring-green-200'  },
-    { label: 'Women',       icon: 'users',        bg: 'bg-purple-50', text: 'text-purple-600', ring: 'hover:ring-purple-200' },
-    { label: 'Hunger',      icon: 'utensils',     bg: 'bg-orange-50', text: 'text-orange-500', ring: 'hover:ring-orange-200' },
-    { label: 'Animals',     icon: 'paw-print',    bg: 'bg-yellow-50', text: 'text-yellow-600', ring: 'hover:ring-yellow-200' },
+{ label: 'Education',   icon: 'book-open',   color: '#2563eb' },
+{ label: 'Healthcare',  icon: 'heart-pulse',  color: '#dc2626' },
+{ label: 'Environment', icon: 'leaf',         color: '#16a34a' },
+{ label: 'Women',       icon: 'users',        color: '#9333ea' },
+{ label: 'Hunger',      icon: 'utensils',     color: '#ea580c' },
+{ label: 'Animals',     icon: 'paw-print',    color: '#ca8a04' },
 ];
 
-const STATS = [
-    { value: '51+',   label: 'Verified NGOs',     icon: 'building-2'   },
-    { value: '₹12L+', label: 'Donations Raised',  icon: 'indian-rupee' },
-    { value: '16',    label: 'Causes Supported',  icon: 'heart'        },
-    { value: '100%',  label: 'Goes to NGOs',      icon: 'shield-check' },
+const TICKER = [
+'Pratham Education', 'CRY India', 'Goonj', 'Smile Foundation',
+'HelpAge India', 'Teach For India', 'Give India', 'Akshaya Patra',
+'Magic Bus', 'Nanhi Kali', 'iPartner India', 'PETA India',
 ];
 
-const HOW_IT_WORKS = [
-    { step: '01', title: 'Discover',  desc: 'Browse verified NGOs filtered by cause, location, or campaign.', icon: 'search'              },
-    { step: '02', title: 'Choose',    desc: 'Pick an NGO or a specific campaign you want to support.',         icon: 'mouse-pointer-click' },
-    { step: '03', title: 'Donate',    desc: 'Give securely via card, UPI, or net banking — 100% reaches them.', icon: 'heart'             },
+const STEPS = [
+{ n: '01', title: 'Discover',  body: 'Browse 51+ manually verified NGOs by cause, location, or active campaign.' },
+{ n: '02', title: 'Choose',    body: 'Select a specific campaign or give directly — see impact before you donate.' },
+{ n: '03', title: 'Donate',    body: '100% reaches the NGO. Receipt in your inbox the moment you give.' },
 ];
 
+/* ─── tiny hooks ─────────────────────────────────────────── */
+function useInView(threshold = 0.15) {
+const ref = useRef(null);
+const [seen, setSeen] = useState(false);
+useEffect(() => {
+    const io = new IntersectionObserver(
+    ([e]) => { if (e.isIntersecting) setSeen(true); },
+    { threshold }
+    );
+    if (ref.current) io.observe(ref.current);
+    return () => io.disconnect();
+}, []);
+return [ref, seen];
+}
+
+function Counter({ to, prefix = '', suffix = '', run, duration = 1600 }) {
+const [v, setV] = useState(0);
+useEffect(() => {
+    if (!run) return;
+    let t0 = null;
+    const tick = ts => {
+    if (!t0) t0 = ts;
+    const p = Math.min((ts - t0) / duration, 1);
+    setV(Math.floor((1 - Math.pow(1 - p, 4)) * to));
+    if (p < 1) requestAnimationFrame(tick);
+    else setV(to);
+    };
+    requestAnimationFrame(tick);
+}, [run, to, duration]);
+return <>{prefix}{run ? v : 0}{suffix}</>;
+}
+
+/* ═══════════════════════════════════════════════════════════
+COMPONENT
+═══════════════════════════════════════════════════════════ */
 export default function Home() {
-    const { user } = useAuth();
+const { user } = useAuth();
+const [heroRef,  heroSeen]  = useInView(0.05);
+const [statsRef, statsSeen] = useInView(0.3);
+const [stepsRef, stepsSeen] = useInView(0.1);
 
-    return (
-    <div className="min-h-screen w-full bg-white">
-
+return (
+    <div className="min-h-screen w-full bg-white overflow-x-hidden">
     <Navbar />
-    {/* ── Hero ── */}
-    <section className="relative w-full overflow-hidden bg-white">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#f0fdf4_1px,transparent_1px),linear-gradient(to_bottom,#f0fdf4_1px,transparent_1px)] bg-[size:48px_48px] opacity-50" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(220,252,231,0.6),transparent)]" />
 
-        <div className="relative w-full max-w-5xl mx-auto px-6 lg:px-8 pt-20 pb-28 text-center">
-        {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-white border border-green-200 text-green-700 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-8 shadow-sm">
-                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                100% Verified NGOs · Transparent Donations
+    {/* ═══ HERO ═══════════════════════════════════════════ */}
+    <section
+        ref={heroRef}
+        className="relative w-full overflow-hidden"
+        style={{ minHeight: 'calc(100vh - 64px)' }}
+    >
+        {/* bg gradient */}
+        <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse 140% 100% at 50% -20%, #f0fdf4 0%, #fafaf9 55%, #fff 100%)',
+        }} />
+
+        {/* ultra-light grid */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+        backgroundImage: 'linear-gradient(#e5e7eb 1px, transparent 1px), linear-gradient(90deg, #e5e7eb 1px, transparent 1px)',
+        backgroundSize: '72px 72px',
+        opacity: 0.25,
+        }} />
+
+        {/* accent circle */}
+        <div className="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(134,239,172,0.18) 0%, transparent 70%)' }} />
+
+        <div
+        className="relative w-full max-w-5xl mx-auto px-6 lg:px-8 flex flex-col justify-center"
+        style={{ minHeight: 'calc(100vh - 64px)', paddingTop: '5rem', paddingBottom: '6rem' }}
+        >
+        <div className="max-w-3xl">
+
+            {/* eyebrow */}
+            <div className={`flex items-center gap-3 mb-8 transition-all duration-700 ${heroSeen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-[11px] font-bold tracking-[0.16em] uppercase text-gray-500">
+                India's Trusted NGO Platform
+            </span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-gray-900 leading-[1.1] tracking-tight mb-6 max-w-3xl mx-auto">
-                Give to Causes that{' '}
-                    <span className="relative inline-block">
-                    <span className="relative z-10 text-green-600">Truly Matters</span>
-                    <svg className="absolute -bottom-1 left-0 w-full" viewBox="0 0 300 12" fill="none" aria-hidden="true">
-                    <path d="M2 9C50 3 100 1 150 4C200 7 250 9 298 5" stroke="#86efac" strokeWidth="3" strokeLinecap="round"/>
-                    </svg>
-                </span>
+            {/* headline */}
+            <h1
+            className={`font-black text-gray-950 leading-[0.96] tracking-tight mb-8 transition-all duration-700 delay-100 ${heroSeen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+            style={{ fontSize: 'clamp(2.8rem, 8.5vw, 6.5rem)' }}
+            >
+            <span className="block">Change starts</span>
+            <span className="block">with one</span>
+            <span className="block text-green-600">
+                donation.
+                <span className="inline-block w-3 h-3 bg-green-500 rounded-full ml-3 mb-2 align-middle" />
+            </span>
             </h1>
 
-            <p className="text-base text-gray-500 max-w-lg mx-auto mb-10 leading-relaxed">
-                Discover verified non-profits across India and donate directly — education, environment, healthcare and more. Every rupee tracked.
+            {/* subtext */}
+            <p className={`text-lg text-gray-500 leading-relaxed max-w-xl mb-10 font-normal transition-all duration-700 delay-200 ${heroSeen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            Discover verified non-profits across India and give directly —
+            no middlemen, no mystery. Every rupee tracked.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                <Link to="/discover"
-                className="inline-flex items-center gap-2 bg-green-600 text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-green-700 transition-colors shadow-sm shadow-green-200 active:scale-95">
+            {/* CTAs */}
+            <div className={`flex flex-wrap gap-4 items-center mb-10 transition-all duration-700 delay-300 ${heroSeen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <Link
+                to="/discover"
+                className="relative group inline-flex items-center gap-2.5 bg-gray-950 text-white font-bold text-sm px-8 py-4 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-gray-900/30 active:scale-95"
+            >
+                <span className="absolute inset-0 bg-green-600 scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-300" />
+                <span className="relative flex items-center gap-2.5">
                 <Icon name="compass" size={16} />
-                Discover NGOs
+                Explore NGOs
                 <Icon name="arrow-right" size={14} />
+                </span>
             </Link>
+
             {!user && (
-                <Link to="/register"
-                className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-7 py-3 rounded-xl text-sm font-bold hover:border-gray-300 hover:bg-gray-50 transition-colors">
-                <Icon name="user-plus" size={16} />
-                Join as Donor
+                <Link
+                to="/register"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+                >
+                Create account
+                <Icon name="move-right" size={15} />
                 </Link>
             )}
             </div>
 
-            <p className="mt-6 text-xs text-gray-400 flex items-center justify-center gap-1.5">
-            <Icon name="lock" size={11} />
-            Secure payments · Receipts emailed instantly · No hidden fees
-            </p>
-        </div>
-        </section>
+            {/* ── FIX 2: Trust badges — always 3-col single row ── */}
+            <div className={`grid grid-cols-3 gap-x-4 transition-all duration-700 delay-500 ${heroSeen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            {[
+                { icon: 'shield-check', text: '51+ Verified' },
+                { icon: 'lock',         text: 'Secure Pay'   },
+                { icon: 'receipt',      text: 'Receipts'     },
+            ].map((b, i) => (
+                <span key={i} className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-400 whitespace-nowrap">
+                <Icon name={b.icon} size={12} className="text-green-500 flex-shrink-0" />
+                {b.text}
+                </span>
+            ))}
+            </div>
 
-    {/* ── Stats ── */}
-        <section className="w-full border-y border-gray-100 bg-gray-50/60">
-        <div className="w-full max-w-5xl mx-auto px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {STATS.map((stat, i) => (
-            <div key={i} className="flex flex-col items-center text-center gap-2">
-                <div className="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center shadow-sm mb-1">
-                <Icon name={stat.icon} size={18} className="text-green-600" />
-                </div>
-                <p className="text-3xl font-black text-gray-900 tracking-tight leading-none">{stat.value}</p>
-                <p className="text-xs text-gray-400 font-medium">{stat.label}</p>
+        </div>
+        </div>
+
+        {/* ── FIX 1: Scroll hint — properly centered ── */}
+        <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-1.5 animate-bounce opacity-40">
+        <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Scroll</span>
+        <Icon name="chevron-down" size={14} className="text-gray-400" />
+        </div>
+    </section>
+
+    {/* ═══ TICKER ══════════════════════════════════════════ */}
+    <div className="w-full border-y border-gray-100 bg-gray-950 py-3.5 overflow-hidden">
+        <div className="flex w-max" style={{ animation: 'ticker 28s linear infinite' }}>
+        {[...TICKER, ...TICKER].map((name, i) => (
+            <span key={i} className="inline-flex items-center gap-3 px-7 text-[11px] font-semibold text-gray-400 uppercase tracking-widest whitespace-nowrap">
+            <span className="w-1 h-1 rounded-full bg-green-500 flex-shrink-0" />
+            {name}
+            </span>
+        ))}
+        </div>
+    </div>
+
+    {/* ═══ STATS ═══════════════════════════════════════════ */}
+    <section ref={statsRef} className="w-full bg-white">
+        <div className="w-full max-w-5xl mx-auto px-6 lg:px-8 py-20">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-300 mb-10">Impact in numbers</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-0 lg:divide-x divide-gray-100">
+            {[
+            { to: 51,  prefix: '',  suffix: '+',  label: 'Verified NGOs'    },
+            { to: 12,  prefix: '₹', suffix: 'L+', label: 'Donations Raised' },
+            { to: 16,  prefix: '',  suffix: '',   label: 'Causes Supported' },
+            { to: 100, prefix: '',  suffix: '%',  label: 'Goes to NGOs'     },
+            ].map((s, i) => (
+            <div key={i} className="lg:px-10 first:pl-0 last:pr-0">
+                <p className="text-5xl lg:text-6xl font-black text-gray-950 leading-none tabular-nums mb-2">
+                <Counter to={s.to} prefix={s.prefix} suffix={s.suffix} run={statsSeen} duration={1400 + i * 100} />
+                </p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">{s.label}</p>
             </div>
             ))}
         </div>
         </div>
     </section>
 
-    {/* ── How It Works ── */}
-    <section className="w-full py-24">
+    {/* ═══ CAUSES ══════════════════════════════════════════ */}
+    <section className="w-full py-24 border-t border-gray-100">
         <div className="w-full max-w-5xl mx-auto px-6 lg:px-8">
-        <div className="mb-12">
-            <p className="text-xs font-bold text-green-600 uppercase tracking-widest mb-2">Simple process</p>
-            <h2 className="text-2xl font-black text-gray-900">How it works</h2>
+        <div className="flex items-start justify-between mb-14">
+            <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-green-600 mb-3">Browse causes</p>
+            <h2 className="text-4xl font-black text-gray-950 leading-none">
+                Find what<br />moves you.
+            </h2>
+            </div>
+            <Link
+            to="/discover"
+            className="hidden sm:flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-gray-900 border border-gray-200 hover:border-gray-900 px-5 py-2.5 rounded-xl transition-all mt-2"
+            >
+            All NGOs <Icon name="arrow-right" size={12} />
+            </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {HOW_IT_WORKS.map((step, i) => (
-            <div key={i} className="relative flex flex-col gap-4 p-6 bg-white rounded-2xl border border-gray-100 hover:border-green-200 hover:shadow-md transition-all group">
-                <div className="flex items-center justify-between">
-                <div className="w-11 h-11 bg-green-50 rounded-xl flex items-center justify-center group-hover:bg-green-100 transition-colors">
-                    <Icon name={step.icon} size={20} className="text-green-600" />
+
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+            {CAUSES.map((c, i) => (
+            // ── FIX 3: cause filter redirect — ?cause= already correct ✅
+            <Link
+                key={i}
+                to={`/discover?cause=${c.label}`}
+                className="group relative flex flex-col items-center gap-3.5 py-8 px-3 rounded-2xl border border-gray-100 bg-white overflow-hidden transition-all duration-300 hover:border-transparent hover:shadow-xl hover:-translate-y-1"
+            >
+                <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
+                style={{ background: `${c.color}0d` }}
+                />
+                <div
+                className="relative z-10 w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                style={{ background: `${c.color}15`, color: c.color }}
+                >
+                <Icon name={c.icon} size={24} />
                 </div>
-                <span className="text-4xl font-black text-gray-100 group-hover:text-gray-200 transition-colors select-none">{step.step}</span>
+                <span className="relative z-10 text-xs font-black text-gray-700 group-hover:text-gray-950 transition-colors">
+                {c.label}
+                </span>
+            </Link>
+            ))}
+        </div>
+        </div>
+    </section>
+
+    {/* ═══ STORY SECTION ═══════════════════════════════════ */}
+    <section className="w-full py-24 border-t border-gray-100 bg-[#fafaf9]">
+        <div className="w-full max-w-5xl mx-auto px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+
+            <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-green-600 mb-4">Why it matters</p>
+            <h2 className="text-4xl font-black text-gray-950 leading-tight mb-6">
+                Every rupee has<br />a name on it.
+            </h2>
+            <p className="text-base text-gray-500 leading-relaxed mb-6">
+                In India, billions in charitable intent go unrealised every year — not because people don't care, but because the path to giving is broken.
+            </p>
+            <p className="text-base text-gray-500 leading-relaxed mb-8">
+                NGO Connect removes every obstacle between a donor and their cause. No redirects, no opacity, no doubt. Just direct, traceable giving.
+            </p>
+            <Link
+                to="/discover"
+                className="inline-flex items-center gap-2 text-sm font-bold text-green-700 hover:text-green-800 transition-colors group"
+            >
+                Start donating today
+                <span className="group-hover:translate-x-1 transition-transform inline-block">
+                <Icon name="arrow-right" size={14} />
+                </span>
+            </Link>
+            </div>
+
+            <div className="space-y-1">
+            {[
+                { icon: 'check-circle', title: 'Manual verification', desc: 'Every NGO is reviewed before listing — no unverified organizations.' },
+                { icon: 'trending-up',  title: 'Live progress',       desc: 'Campaign fundraising progress updates in real time as donations come in.' },
+                { icon: 'receipt',      title: 'Instant receipts',    desc: 'Your donation receipt is emailed the moment your transaction completes.' },
+                { icon: 'eye',          title: 'Full transparency',   desc: 'See exactly where your money goes — down to the campaign level.' },
+            ].map((f, i) => (
+                <div
+                key={i}
+                className="group flex items-start gap-5 p-5 rounded-2xl hover:bg-white hover:shadow-sm transition-all duration-200 cursor-default"
+                >
+                <div className="w-9 h-9 bg-green-50 group-hover:bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors">
+                    <Icon name={f.icon} size={16} className="text-green-600" />
                 </div>
                 <div>
-                <h3 className="text-sm font-bold text-gray-900 mb-1.5">{step.title}</h3>
-                <p className="text-xs text-gray-400 leading-relaxed">{step.desc}</p>
+                    <p className="text-sm font-black text-gray-900 mb-0.5">{f.title}</p>
+                    <p className="text-xs text-gray-400 leading-relaxed">{f.desc}</p>
                 </div>
-                {i < HOW_IT_WORKS.length - 1 && (
-                <div className="hidden sm:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 bg-white border border-gray-100 rounded-full items-center justify-center shadow-sm">
-                    <Icon name="chevron-right" size={12} className="text-gray-400" />
                 </div>
-                )}
+            ))}
+            </div>
+        </div>
+        </div>
+    </section>
+
+    {/* ═══ HOW IT WORKS ════════════════════════════════════ */}
+    <section ref={stepsRef} className="w-full py-28 bg-gray-950 overflow-hidden relative">
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 text-[30vw] font-black leading-none text-white/[0.02] select-none pointer-events-none hidden lg:block">
+        3
+        </div>
+
+        <div className="relative w-full max-w-5xl mx-auto px-6 lg:px-8">
+        <div className="mb-16">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-green-500 mb-4">Process</p>
+            <h2 className="text-4xl font-black text-white leading-none">How it works.</h2>
+        </div>
+
+        <div className="space-y-0">
+            {STEPS.map((s, i) => (
+            <div
+                key={i}
+                className={`group flex items-start gap-10 py-10 border-t border-white/5 last:border-b hover:bg-white/[0.025] px-5 -mx-5 transition-all duration-200 cursor-default ${stepsSeen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}
+                style={{ transitionDelay: `${i * 120}ms`, transitionProperty: 'opacity, transform' }}
+            >
+                <span className="text-6xl font-black tabular-nums leading-none text-white/10 group-hover:text-white/20 transition-colors w-20 text-right flex-shrink-0 mt-1">
+                {s.n}
+                </span>
+                <div className="flex-1">
+                <h3 className="text-xl font-black text-white mb-2">{s.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed max-w-lg">{s.body}</p>
+                </div>
+                <div className="flex-shrink-0 self-center opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all">
+                <div className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center">
+                    <Icon name="arrow-right" size={14} className="text-green-400" />
+                </div>
+                </div>
             </div>
             ))}
         </div>
-        </div>
-    </section>
 
-    {/* ── Browse by Cause ── */}
-    <section className="w-full py-24 bg-gray-50/60 border-y border-gray-100">
-        <div className="w-full max-w-5xl mx-auto px-6 lg:px-8">
-        <div className="flex items-end justify-between mb-12">
-            <div>
-            <p className="text-xs font-bold text-green-600 uppercase tracking-widest mb-2">Categories</p>
-            <h2 className="text-2xl font-black text-gray-900">Browse by cause</h2>
-            </div>
-            <Link to="/discover"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-green-600 transition-colors">
-            View all <Icon name="arrow-right" size={12} />
+        <div className="mt-12">
+            <Link
+            to="/discover"
+            className="inline-flex items-center gap-2.5 bg-green-600 text-white font-bold text-sm px-8 py-3.5 rounded-2xl hover:bg-green-500 active:scale-95 transition-all"
+            >
+            <Icon name="compass" size={15} />
+            Try it now
             </Link>
         </div>
-        <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
-            {CAUSES.map((c, i) => (
-            <Link key={i} to={`/discover?cause=${c.label}`}
-                className={`flex flex-col items-center gap-3 p-4 bg-white border border-gray-100 rounded-2xl hover:shadow-md hover:ring-2 ${c.ring} hover:-translate-y-0.5 transition-all group`}>
-                <div className={`w-12 h-12 ${c.bg} ${c.text} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                <Icon name={c.icon} size={22} />
-                </div>
-                <span className="text-xs font-bold text-gray-700">{c.label}</span>
+        </div>
+    </section>
+
+    {/* ═══ CTA ══════════════════════════════════════════════ */}
+    <section
+        className="w-full relative overflow-hidden"
+        style={{
+        background: 'linear-gradient(135deg, #052e16 0%, #14532d 50%, #166534 100%)',
+        paddingTop: '7rem',
+        paddingBottom: '7rem',
+        }}
+    >
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
+        backgroundRepeat: 'repeat',
+        backgroundSize: '200px',
+        }} />
+        <div
+        className="absolute -top-48 -right-48 w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(134,239,172,0.12) 0%, transparent 70%)' }}
+        />
+
+        <div className="relative w-full max-w-5xl mx-auto px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-12">
+            <div className="max-w-2xl">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-green-400 mb-5">Ready?</p>
+            <h2
+                className="font-black text-white leading-[0.95] tracking-tight"
+                style={{ fontSize: 'clamp(3rem, 8vw, 6rem)' }}
+            >
+                Make your<br />
+                <span className="text-green-400">giving</span><br />
+                count.
+            </h2>
+            </div>
+
+            <div className="flex flex-col gap-4 max-w-xs">
+            <p className="text-sm text-green-200/70 leading-relaxed">
+                Join thousands of donors across India. Zero platform fees. Every rupee verified.
+            </p>
+            <Link
+                to="/discover"
+                className="group inline-flex items-center justify-center gap-2.5 bg-white text-gray-950 font-black text-sm px-8 py-4 rounded-2xl hover:bg-green-50 active:scale-95 transition-all shadow-2xl shadow-black/40"
+            >
+                <Icon name="compass" size={16} />
+                Explore NGOs
+                <span className="group-hover:translate-x-1 transition-transform inline-block">
+                <Icon name="arrow-right" size={14} />
+                </span>
             </Link>
-            ))}
+            {!user && (
+                <Link
+                to="/register"
+                className="inline-flex items-center justify-center gap-2 border border-white/15 text-white/80 font-semibold text-sm px-7 py-3.5 rounded-2xl hover:bg-white/10 transition-colors"
+                >
+                <Icon name="user-plus" size={15} />
+                Create Free Account
+                </Link>
+            )}
+            <p className="text-[10px] text-green-500/60 flex items-center gap-1.5 mt-1">
+                <Icon name="shield-check" size={10} />
+                Secure · Transparent · Zero fees
+            </p>
+            </div>
         </div>
         </div>
     </section>
 
-    {/* ── CTA Banner ── */}
-    <section className="w-full py-24">
-        <div className="w-full max-w-5xl mx-auto px-6 lg:px-8">
-        <div className="relative overflow-hidden bg-gray-900 rounded-3xl p-10 lg:p-14">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-green-600/10 rounded-full -translate-y-1/2 translate-x-1/4 blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-72 h-72 bg-green-400/10 rounded-full translate-y-1/2 -translate-x-1/4 blur-3xl pointer-events-none" />
-
-            <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-            <div className="max-w-lg">
-                <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-semibold px-3 py-1.5 rounded-full mb-5">
-                <Icon name="sparkles" size={11} />
-                Make a difference today
-                </div>
-                <h2 className="text-2xl lg:text-3xl font-black text-white leading-tight mb-3">
-                Ready to create<br />real change?
-                </h2>
-                <p className="text-sm text-gray-400 leading-relaxed">
-                Join donors across India supporting verified NGOs. Every rupee is tracked and goes directly to the cause.
-                </p>
-            </div>
-            <div className="flex flex-col sm:flex-row lg:flex-col gap-3 flex-shrink-0">
-                <Link to="/discover"
-                className="inline-flex items-center justify-center gap-2 bg-green-600 text-white font-bold px-7 py-3 rounded-xl text-sm hover:bg-green-500 active:scale-95 transition-all">
-                <Icon name="compass" size={15} />
-                Start Discovering
-                </Link>
-                <Link to="/register-ngo"
-                className="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/10 text-white font-semibold px-7 py-3 rounded-xl text-sm hover:bg-white/20 transition-colors">
-                <Icon name="building-2" size={15} />
-                Register Your NGO
-                </Link>
-            </div>
-            </div>
-        </div>
-        </div>
-    </section>
+    <style>{`
+        @keyframes ticker {
+        from { transform: translateX(0);    }
+        to   { transform: translateX(-50%); }
+        }
+    `}</style>
 
     <Footer />
     </div>

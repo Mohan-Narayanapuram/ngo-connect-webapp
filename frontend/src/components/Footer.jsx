@@ -3,9 +3,9 @@ import Icon from './Icon';
 
 const FOOTER_LINKS = {
   Platform: [
-    { label: 'Discover NGOs', to: '/discover'     },
-    { label: 'How It Works',  to: '/about'         },
-    { label: 'Register NGO',  to: '/register-ngo'  },
+    { label: 'Discover NGOs', to: '/discover'    },
+    { label: 'How It Works',  to: '/about'        },
+    { label: 'Register NGO',  to: '/register-ngo' },
   ],
   Support: [
     { label: 'Help Center', to: '/faq'         },
@@ -20,10 +20,10 @@ export default function Footer() {
       <div className="max-w-5xl mx-auto px-6 lg:px-8">
 
         {/* Main footer content */}
-        <div className="py-10 flex flex-col md:flex-row justify-between gap-10">
+        <div className="py-10 grid grid-cols-2 md:grid-cols-[1fr_auto] gap-10">
 
-          {/* Brand column */}
-          <div className="max-w-xs">
+          {/* Brand column — full width on mobile */}
+          <div className="col-span-2 md:col-span-1 max-w-xs">
             <Link to="/" className="flex items-center gap-2 mb-3 group w-fit">
               <div className="w-7 h-7 bg-green-600 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
                 <Icon name="heart-handshake" size={14} className="text-white" />
@@ -36,12 +36,12 @@ export default function Footer() {
               Connecting donors with verified NGOs across India. Every rupee is tracked and goes directly to the cause.
             </p>
             {/* Trust badges */}
-            <div className="flex items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-50 border border-green-100 px-2 py-1 rounded-full font-medium">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-50 border border-green-100 px-2 py-1 rounded-full font-medium whitespace-nowrap">
                 <Icon name="shield-check" size={10} />
                 Verified NGOs
               </span>
-              <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-50 border border-gray-100 px-2 py-1 rounded-full font-medium">
+              <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-50 border border-gray-100 px-2 py-1 rounded-full font-medium whitespace-nowrap">
                 <Icon name="lock" size={10} />
                 Secure
               </span>
@@ -49,17 +49,19 @@ export default function Footer() {
           </div>
 
           {/* Link columns */}
-          <div className="flex gap-12 sm:gap-16 text-xs">
+          <div className="flex gap-10 sm:gap-16 text-xs col-span-2 md:col-span-1">
             {Object.entries(FOOTER_LINKS).map(([section, links]) => (
-              <div key={section}>
-                <p className="font-bold text-gray-700 mb-3 uppercase tracking-widest text-xs">
+              <div key={section} className="flex-1">
+                <p className="font-bold text-gray-700 mb-3 uppercase tracking-widest text-[10px]">
                   {section}
                 </p>
                 <ul className="space-y-2.5">
                   {links.map(({ label, to }) => (
                     <li key={label}>
-                      <Link to={to}
-                        className="text-gray-400 hover:text-gray-800 transition-colors">
+                      <Link
+                        to={to}
+                        className="text-gray-400 hover:text-gray-800 transition-colors leading-relaxed"
+                      >
                         {label}
                       </Link>
                     </li>
@@ -75,10 +77,10 @@ export default function Footer() {
           <p className="text-xs text-gray-300">
             © {new Date().getFullYear()} NGOConnect. All rights reserved.
           </p>
-          <div className="flex items-center gap-5">
-            <Link to="/privacy"  className="text-xs text-gray-300 hover:text-gray-500 transition-colors">Privacy Policy</Link>
-            <Link to="/terms"    className="text-xs text-gray-300 hover:text-gray-500 transition-colors">Terms of Service</Link>
-            <Link to="/cookies"  className="text-xs text-gray-300 hover:text-gray-500 transition-colors">Cookie Policy</Link>
+          <div className="flex items-center flex-wrap justify-center gap-x-5 gap-y-1">
+            <Link to="/privacy" className="text-xs text-gray-300 hover:text-gray-500 transition-colors whitespace-nowrap">Privacy Policy</Link>
+            <Link to="/terms"   className="text-xs text-gray-300 hover:text-gray-500 transition-colors whitespace-nowrap">Terms of Service</Link>
+            <Link to="/cookies" className="text-xs text-gray-300 hover:text-gray-500 transition-colors whitespace-nowrap">Cookie Policy</Link>
           </div>
         </div>
 

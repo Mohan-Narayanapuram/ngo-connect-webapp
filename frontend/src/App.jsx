@@ -1,5 +1,7 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
+import ScrollToTop from './components/ScrollToTop';
 import { AuthProvider } from './context/AuthContext';
 
 import About from './pages/About';
@@ -18,39 +20,65 @@ import NotFound from './pages/NotFound';
 import Register from './pages/Register';
 import UnderConstruction from './pages/UnderConstruction';
 
+// Wraps all routes with a fade-in on every navigation
+function AnimatedRoutes() {
+  const location = useLocation();
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    ref.current.style.opacity = '0';
+    ref.current.style.transform = 'translateY(6px)';
+    const raf = requestAnimationFrame(() => {
+      if (!ref.current) return;
+      ref.current.style.transition = 'opacity 220ms ease, transform 220ms ease';
+      ref.current.style.opacity = '1';
+      ref.current.style.transform = 'translateY(0)';
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [location.pathname]);
+
+  return (
+    <div ref={ref}>
+      <Routes location={location}>
+        {/* Public */}
+        <Route path="/"         element={<Home />} />
+        <Route path="/discover" element={<NgoList />} />
+        <Route path="/ngo/:id"  element={<NgoProfile />} />
+        <Route path="/login"    element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/about"    element={<About />} />
+        <Route path="/contact"  element={<Contact />} />
+        <Route path="/faq"      element={<FAQ />} />
+        <Route path="/privacy"  element={<PrivacyPolicy />} />
+        <Route path="/terms"    element={<TermsOfService />} />
+        <Route path="/cookies"  element={<CookiePolicy />} />
+        <Route path="/register-ngo" element={<UnderConstruction />} />
+
+        {/* Protected */}
+        <Route path="/donate/:ngoId" element={
+          <ProtectedRoute><DonatePage /></ProtectedRoute>
+        } />
+        <Route path="/donate/:ngoId/:campaignId" element={
+          <ProtectedRoute><DonatePage /></ProtectedRoute>
+        } />
+        <Route path="/dashboard" element={
+          <ProtectedRoute><Dashboard /></ProtectedRoute>
+        } />
+
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          {/* Public */}
-          <Route path="/"         element={<Home />} />
-          <Route path="/discover" element={<NgoList />} />
-          <Route path="/ngo/:id"  element={<NgoProfile />} />
-          <Route path="/login"    element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/about"    element={<About />} />
-          <Route path="/contact"  element={<Contact />} />
-          <Route path="/faq"      element={<FAQ />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms"   element={<TermsOfService />} />
-          <Route path="/cookies" element={<CookiePolicy />} />
-          <Route path="/register-ngo" element={<UnderConstruction />} />
-
-          {/* Protected */}
-          <Route path="/donate/:ngoId" element={
-            <ProtectedRoute><DonatePage /></ProtectedRoute>
-          } />
-          <Route path="/donate/:ngoId/:campaignId" element={
-            <ProtectedRoute><DonatePage /></ProtectedRoute>
-          } />
-          <Route path="/dashboard" element={
-            <ProtectedRoute><Dashboard /></ProtectedRoute>
-          } />
-
-          {/* 404 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <ScrollToTop />
+        <AnimatedRoutes />
       </BrowserRouter>
     </AuthProvider>
   );
