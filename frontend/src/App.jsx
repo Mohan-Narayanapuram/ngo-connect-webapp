@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
 import { AuthProvider } from './context/AuthContext';
+import LoggedOut from './pages/LoggedOut';
 
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -54,6 +55,7 @@ function AnimatedRoutes() {
         <Route path="/terms"    element={<TermsOfService />} />
         <Route path="/cookies"  element={<CookiePolicy />} />
         <Route path="/register-ngo" element={<UnderConstruction />} />
+        <Route path="/logged-out" element={<LoggedOut />} />
 
         {/* Protected */}
         <Route path="/donate/:ngoId" element={

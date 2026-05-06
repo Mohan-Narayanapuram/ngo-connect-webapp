@@ -75,7 +75,7 @@ function FilterBar({ search, onSearch, causes, selectedCauses, onToggleCause, re
           {hasActiveFilter && (
             <button onClick={onClear}
               className="text-xs text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1 flex-shrink-0">
-              <Icon name="x-circle" size={12} />
+              <Icon name="Funnel-X" size={12} />
               Clear all
             </button>
           )}

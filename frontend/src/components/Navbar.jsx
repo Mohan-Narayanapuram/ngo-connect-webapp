@@ -45,7 +45,7 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     setDropdownOpen(false);
-    navigate('/');
+    navigate('/logged-out');
   };
 
   const initials = user?.name
