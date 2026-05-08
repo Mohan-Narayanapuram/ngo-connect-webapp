@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Campaign Milestone — {{APP_NAME}}</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f2f5;padding:48px 0;">
+    <tr><td align="center">
+      <table width="580" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+        <tr>
+          <td style="background:linear-gradient(135deg,#16a34a 0%,#15803d 100%);padding:40px 48px;text-align:center;">
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
+              <tr>
+                <td style="background:rgba(255,255,255,0.15);border-radius:14px;padding:10px 20px;">
+                  <span style="color:#ffffff;font-size:20px;font-weight:800;letter-spacing:-0.5px;">{{APP_NAME}}</span>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:0;color:rgba(255,255,255,0.85);font-size:14px;font-weight:500;">Campaign Update</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:48px 48px 36px;">
+            <h1 style="margin:0 0 10px;font-size:28px;font-weight:900;color:#0f172a;letter-spacing:-1px;">{{pct}}% Milestone Reached</h1>
+            <p style="margin:0 0 32px;font-size:15px;color:#64748b;line-height:1.75;">
+              Your campaign <strong style="color:#1e293b;">{{campaignTitle}}</strong> has reached <strong style="color:#16a34a;">{{pct}}%</strong> of its fundraising goal. Keep the momentum going.
+            </p>
+
+            <!-- Progress card -->
+            <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:16px;padding:28px;margin-bottom:32px;">
+              <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:16px;">
+                <tr>
+                  <td>
+                    <p style="margin:0 0 4px;font-size:11px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:1px;">Amount Raised</p>
+                    <p style="margin:0;font-size:32px;font-weight:900;color:#15803d;letter-spacing:-1px;">&#8377;{{raised}}</p>
+                  </td>
+                  <td align="right" style="vertical-align:bottom;">
+                    <p style="margin:0 0 4px;font-size:11px;font-weight:700;color:#86efac;text-transform:uppercase;letter-spacing:1px;text-align:right;">Goal</p>
+                    <p style="margin:0;font-size:20px;font-weight:800;color:#4ade80;text-align:right;">&#8377;{{goal}}</p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Progress bar -->
+              <div style="background:rgba(255,255,255,0.5);border-radius:100px;height:12px;overflow:hidden;margin-bottom:8px;">
+                <div style="background:#16a34a;height:12px;border-radius:100px;width:{{pct}}%;"></div>
+              </div>
+              <p style="margin:0;font-size:13px;font-weight:700;color:#15803d;text-align:right;">{{pct}}% complete</p>
+            </div>
+
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+              <tr>
+                <td style="background:#16a34a;border-radius:12px;">
+                  <a href="{{APP_URL}}/dashboard" style="display:inline-block;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;padding:15px 40px;">
+                    View Campaign
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="background:#f8fafc;border-top:1px solid #f1f5f9;padding:24px 48px;">
+            <table cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td>
+                  <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#64748b;">{{APP_NAME}}</p>
+                  <p style="margin:0;font-size:11px;color:#cbd5e1;">© {{YEAR}} All rights reserved.</p>
+                </td>
+                <td align="right">
+                  <a href="{{APP_URL}}" style="font-size:11px;color:#16a34a;text-decoration:none;">{{APP_URL}}</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

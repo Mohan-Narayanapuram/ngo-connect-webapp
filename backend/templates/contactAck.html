@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Message Received — {{APP_NAME}}</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f2f5;padding:48px 0;">
+    <tr><td align="center">
+      <table width="580" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+        <tr>
+          <td style="background:linear-gradient(135deg,#16a34a 0%,#15803d 100%);padding:40px 48px;text-align:center;">
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
+              <tr>
+                <td style="background:rgba(255,255,255,0.15);border-radius:14px;padding:10px 20px;">
+                  <span style="color:#ffffff;font-size:20px;font-weight:800;letter-spacing:-0.5px;">{{APP_NAME}}</span>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:0;color:rgba(255,255,255,0.85);font-size:14px;font-weight:500;">We received your message</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:48px;text-align:center;">
+            <div style="width:64px;height:64px;background:#f0fdf4;border:2px solid #86efac;border-radius:50%;margin:0 auto 24px;display:table-cell;vertical-align:middle;text-align:center;">
+              <span style="font-size:24px;color:#16a34a;font-weight:900;line-height:60px;display:block;">&#10003;</span>
+            </div>
+            <h1 style="margin:0 0 12px;font-size:24px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">Message Received, {{name}}</h1>
+            <p style="margin:0 0 32px;font-size:15px;color:#64748b;line-height:1.75;max-width:400px;display:inline-block;">
+              Thank you for reaching out to us. Our team has received your message and will respond within 24 to 48 hours.
+            </p>
+
+            <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:14px;padding:18px 24px;margin-bottom:36px;text-align:left;">
+              <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:1px;">Need Urgent Help?</p>
+              <p style="margin:0;font-size:13px;color:#16a34a;line-height:1.6;">
+                Reach us directly at <strong>ngoconnect.platform@gmail.com</strong>
+              </p>
+            </div>
+
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+              <tr>
+                <td style="background:#16a34a;border-radius:12px;">
+                  <a href="{{APP_URL}}/discover" style="display:inline-block;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;padding:15px 40px;">
+                    Browse NGOs
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="background:#f8fafc;border-top:1px solid #f1f5f9;padding:24px 48px;">
+            <table cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td>
+                  <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#64748b;">{{APP_NAME}}</p>
+                  <p style="margin:0;font-size:11px;color:#cbd5e1;">© {{YEAR}} All rights reserved.</p>
+                </td>
+                <td align="right">
+                  <a href="{{APP_URL}}" style="font-size:11px;color:#16a34a;text-decoration:none;">{{APP_URL}}</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

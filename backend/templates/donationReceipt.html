@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Donation Receipt — {{APP_NAME}}</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f2f5;padding:48px 0;">
+    <tr><td align="center">
+      <table width="580" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+        <tr>
+          <td style="background:linear-gradient(135deg,#16a34a 0%,#15803d 100%);padding:40px 48px;text-align:center;">
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
+              <tr>
+                <td style="background:rgba(255,255,255,0.15);border-radius:14px;padding:10px 20px;">
+                  <span style="color:#ffffff;font-size:20px;font-weight:800;letter-spacing:-0.5px;">{{APP_NAME}}</span>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:0;color:rgba(255,255,255,0.85);font-size:14px;font-weight:500;">Official Donation Receipt</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:48px 48px 36px;">
+
+            <h1 style="margin:0 0 10px;font-size:26px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">Thank you, {{name}}</h1>
+            <p style="margin:0 0 32px;font-size:15px;color:#64748b;line-height:1.75;">
+              Your donation has been received and processed successfully. Every rupee goes directly to the cause you supported.
+            </p>
+
+            <!-- Amount block -->
+            <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:16px;padding:32px;text-align:center;margin-bottom:32px;">
+              <p style="margin:0 0 8px;font-size:11px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:2px;">Total Donated</p>
+              <p style="margin:0;font-size:48px;font-weight:900;color:#15803d;letter-spacing:-2px;">&#8377;{{amount}}</p>
+              <p style="margin:8px 0 0;font-size:13px;color:#4ade80;font-weight:600;">to {{ngoName}}</p>
+            </div>
+
+            <!-- Receipt table -->
+            <div style="border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;margin-bottom:28px;">
+              <table cellpadding="0" cellspacing="0" width="100%">
+                <tr style="background:#f8fafc;">
+                  <td colspan="2" style="padding:14px 24px;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1.5px;">Receipt Details</td>
+                </tr>
+                <tr style="border-top:1px solid #f1f5f9;">
+                  <td style="padding:14px 24px;font-size:13px;color:#64748b;font-weight:600;width:45%;">Donor Name</td>
+                  <td style="padding:14px 24px;font-size:13px;color:#1e293b;font-weight:700;text-align:right;">{{name}}</td>
+                </tr>
+                <tr style="border-top:1px solid #f1f5f9;background:#fafafa;">
+                  <td style="padding:14px 24px;font-size:13px;color:#64748b;font-weight:600;">Organization</td>
+                  <td style="padding:14px 24px;font-size:13px;color:#1e293b;font-weight:700;text-align:right;">{{ngoName}}</td>
+                </tr>
+                <tr style="border-top:1px solid #f1f5f9;">
+                  <td style="padding:14px 24px;font-size:13px;color:#64748b;font-weight:600;">Campaign</td>
+                  <td style="padding:14px 24px;font-size:13px;color:#1e293b;font-weight:700;text-align:right;">{{campaignTitle}}</td>
+                </tr>
+                <tr style="border-top:1px solid #f1f5f9;background:#fafafa;">
+                  <td style="padding:14px 24px;font-size:13px;color:#64748b;font-weight:600;">Payment Method</td>
+                  <td style="padding:14px 24px;font-size:13px;color:#1e293b;font-weight:700;text-align:right;">{{paymentMethod}}</td>
+                </tr>
+                <tr style="border-top:1px solid #f1f5f9;">
+                  <td style="padding:14px 24px;font-size:13px;color:#64748b;font-weight:600;">Date &amp; Time</td>
+                  <td style="padding:14px 24px;font-size:13px;color:#1e293b;font-weight:700;text-align:right;">{{date}}</td>
+                </tr>
+                <tr style="border-top:1px solid #f1f5f9;background:#fafafa;">
+                  <td style="padding:14px 24px;font-size:13px;color:#64748b;font-weight:600;">Reference ID</td>
+                  <td style="padding:14px 24px;font-size:12px;color:#1e293b;font-weight:700;text-align:right;font-family:'Courier New',monospace;">{{refId}}</td>
+                </tr>
+              </table>
+            </div>
+
+            <!-- Tax note -->
+            <div style="background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #f59e0b;border-radius:0 12px 12px 0;padding:14px 20px;margin-bottom:32px;">
+              <p style="margin:0 0 3px;font-size:12px;font-weight:700;color:#92400e;">Tax Documentation</p>
+              <p style="margin:0;font-size:12px;color:#b45309;line-height:1.6;">
+                Please retain this email as your official donation receipt. This document serves as proof of your charitable contribution to {{ngoName}}.
+              </p>
+            </div>
+
+            <!-- CTAs -->
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+              <tr>
+                <td style="padding-right:12px;">
+                  <table cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="background:#16a34a;border-radius:12px;">
+                        <a href="{{APP_URL}}/dashboard" style="display:inline-block;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;padding:13px 28px;">
+                          View Dashboard
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td>
+                  <table cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="background:#f1f5f9;border-radius:12px;">
+                        <a href="{{APP_URL}}/discover" style="display:inline-block;color:#475569;text-decoration:none;font-size:13px;font-weight:700;padding:13px 28px;">
+                          Donate Again
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+          </td>
+        </tr>
+
+        <tr>
+          <td style="background:#f8fafc;border-top:1px solid #f1f5f9;padding:24px 48px;">
+            <table cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td>
+                  <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#64748b;">{{APP_NAME}}</p>
+                  <p style="margin:0;font-size:11px;color:#cbd5e1;">© {{YEAR}} · Automated receipt · Do not reply</p>
+                </td>
+                <td align="right">
+                  <a href="{{APP_URL}}" style="font-size:11px;color:#16a34a;text-decoration:none;">{{APP_URL}}</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome to {{APP_NAME}}</title>
+  <style>
+    @media only screen and (max-width: 600px) {
+      .email-wrapper { padding: 24px 0 !important; }
+      .email-card    { border-radius: 0 !important; width: 100% !important; }
+      .email-body    { padding: 32px 24px !important; }
+      .email-header  { padding: 32px 24px !important; }
+      .email-footer  { padding: 20px 24px !important; }
+      .feature-table { display: block !important; }
+      .feature-cell  {
+        display: block !important;
+        width: 100% !important;
+        padding: 0 0 12px 0 !important;
+        box-sizing: border-box !important;
+      }
+      .feature-box   { margin: 0 !important; }
+      .cta-btn       { padding: 14px 28px !important; font-size: 13px !important; }
+      .amount-text   { font-size: 36px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" class="email-wrapper" style="background:#f0f2f5;padding:48px 0;">
+    <tr><td align="center" style="padding:0 16px;">
+
+      <table width="100%" cellpadding="0" cellspacing="0" class="email-card" style="max-width:580px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+        <!-- Header -->
+        <tr>
+          <td class="email-header" style="background:linear-gradient(135deg,#16a34a 0%,#15803d 100%);padding:40px 48px;text-align:center;">
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto 14px;">
+              <tr>
+                <td style="background:rgba(255,255,255,0.15);border-radius:14px;padding:10px 22px;">
+                  <span style="color:#ffffff;font-size:20px;font-weight:800;letter-spacing:-0.5px;">{{APP_NAME}}</span>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:0;color:rgba(255,255,255,0.85);font-size:14px;font-weight:500;line-height:1.5;">Connecting Donors with Verified NGOs</p>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td class="email-body" style="padding:40px 48px 36px;">
+
+            <h1 style="margin:0 0 12px;font-size:24px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;line-height:1.3;">Welcome aboard, {{name}}</h1>
+            <p style="margin:0 0 28px;font-size:15px;color:#64748b;line-height:1.75;">
+              Your account has been created successfully. You are now part of a platform connecting generous donors with verified non-governmental organizations across India.
+            </p>
+
+            <!-- Divider -->
+            <div style="height:1px;background:#f1f5f9;margin-bottom:28px;"></div>
+
+            <p style="margin:0 0 18px;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1.5px;">What you can do</p>
+
+            <!-- Feature grid — stacks on mobile -->
+            <table class="feature-table" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:32px;">
+              <tr>
+                <!-- Feature 1 -->
+                <td class="feature-cell" width="50%" style="padding:0 6px 12px 0;vertical-align:top;">
+                  <div class="feature-box" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:18px;">
+                    <div style="width:36px;height:36px;background:#dcfce7;border-radius:10px;margin-bottom:12px;text-align:center;line-height:36px;">
+                      <span style="font-size:16px;color:#16a34a;font-weight:900;">+</span>
+                    </div>
+                    <p style="margin:0 0 5px;font-size:13px;font-weight:700;color:#1e293b;line-height:1.3;">Discover NGOs</p>
+                    <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.6;">Browse verified organizations by cause and location</p>
+                  </div>
+                </td>
+                <!-- Feature 2 -->
+                <td class="feature-cell" width="50%" style="padding:0 0 12px 6px;vertical-align:top;">
+                  <div class="feature-box" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:18px;">
+                    <div style="width:36px;height:36px;background:#dcfce7;border-radius:10px;margin-bottom:12px;text-align:center;line-height:36px;">
+                      <span style="font-size:15px;color:#16a34a;font-weight:900;">&#8377;</span>
+                    </div>
+                    <p style="margin:0 0 5px;font-size:13px;font-weight:700;color:#1e293b;line-height:1.3;">Donate Securely</p>
+                    <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.6;">Support campaigns with safe and transparent payments</p>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <!-- Feature 3 -->
+                <td class="feature-cell" width="50%" style="padding:0 6px 0 0;vertical-align:top;">
+                  <div class="feature-box" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:18px;">
+                    <div style="width:36px;height:36px;background:#dcfce7;border-radius:10px;margin-bottom:12px;text-align:center;line-height:36px;">
+                      <span style="font-size:14px;color:#16a34a;font-weight:900;">&#9632;</span>
+                    </div>
+                    <p style="margin:0 0 5px;font-size:13px;font-weight:700;color:#1e293b;line-height:1.3;">Track Impact</p>
+                    <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.6;">View all your donations and receipts in your dashboard</p>
+                  </div>
+                </td>
+                <!-- Feature 4 -->
+                <td class="feature-cell" width="50%" style="padding:0 0 0 6px;vertical-align:top;">
+                  <div class="feature-box" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:18px;">
+                    <div style="width:36px;height:36px;background:#dcfce7;border-radius:10px;margin-bottom:12px;text-align:center;line-height:36px;">
+                      <span style="font-size:14px;color:#16a34a;font-weight:900;">&#9679;</span>
+                    </div>
+                    <p style="margin:0 0 5px;font-size:13px;font-weight:700;color:#1e293b;line-height:1.3;">Live Campaigns</p>
+                    <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.6;">Support active campaigns with real-time progress</p>
+                  </div>
+                </td>
+              </tr>
+            </table>
+
+            <!-- CTA -->
+            <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:28px;">
+              <tr>
+                <td align="center">
+                  <table cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="background:#16a34a;border-radius:12px;">
+                        <a href="{{APP_URL}}/discover" class="cta-btn" style="display:inline-block;color:#ffffff;text-decoration:none;font-size:14px;font-weight:700;padding:15px 48px;letter-spacing:0.2px;">
+                          Start Exploring
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin:0;font-size:12px;color:#cbd5e1;text-align:center;line-height:1.7;">
+              If you did not create this account, you can safely ignore this email.
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td class="email-footer" style="background:#f8fafc;border-top:1px solid #f1f5f9;padding:22px 48px;">
+            <table cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td style="vertical-align:middle;">
+                  <p style="margin:0 0 3px;font-size:12px;font-weight:700;color:#64748b;">{{APP_NAME}}</p>
+                  <p style="margin:0;font-size:11px;color:#cbd5e1;">© {{YEAR}} All rights reserved.</p>
+                </td>
+                <td align="right" style="vertical-align:middle;">
+                  <a href="{{APP_URL}}" style="font-size:11px;color:#16a34a;text-decoration:none;word-break:break-all;">{{APP_URL}}</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+
+    </td></tr>
+  </table>
+</body>
+</html>

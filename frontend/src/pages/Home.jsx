@@ -284,7 +284,7 @@ return (
 
             <div className="space-y-1">
             {[
-                { icon: 'check-circle', title: 'Manual verification', desc: 'Every NGO is reviewed before listing — no unverified organizations.' },
+                { icon: 'circle-check', title: 'Manual verification', desc: 'Every NGO is reviewed before listing — no unverified organizations.' },
                 { icon: 'trending-up',  title: 'Live progress',       desc: 'Campaign fundraising progress updates in real time as donations come in.' },
                 { icon: 'receipt',      title: 'Instant receipts',    desc: 'Your donation receipt is emailed the moment your transaction completes.' },
                 { icon: 'eye',          title: 'Full transparency',   desc: 'See exactly where your money goes — down to the campaign level.' },

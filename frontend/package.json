@@ -10,7 +10,11 @@
   },
   "dependencies": {
     "axios": "^1.6.8",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
     "lucide-react": "^0.513.0",
+    "nodemailer": "^8.0.7",
+    "print-js": "^1.6.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.2"

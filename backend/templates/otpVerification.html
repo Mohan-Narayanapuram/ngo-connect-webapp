@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify Your Email — {{APP_NAME}}</title>
+  <style>
+    @media only screen and (max-width: 600px) {
+      .email-wrapper { padding: 0 !important; }
+      .email-card    { border-radius: 0 !important; width: 100% !important; }
+      .email-body    { padding: 32px 24px !important; }
+      .email-header  { padding: 32px 24px !important; }
+      .email-footer  { padding: 20px 24px !important; }
+      .otp-box       { font-size: 36px !important; letter-spacing: 10px !important; padding: 20px 24px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" class="email-wrapper" style="background:#f0f2f5;padding:48px 16px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" class="email-card" style="max-width:580px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+        <!-- Header -->
+        <tr>
+          <td class="email-header" style="background:linear-gradient(135deg,#16a34a 0%,#15803d 100%);padding:40px 48px;text-align:center;">
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto 14px;">
+              <tr>
+                <td style="background:rgba(255,255,255,0.15);border-radius:14px;padding:10px 22px;">
+                  <span style="color:#ffffff;font-size:20px;font-weight:800;letter-spacing:-0.5px;">{{APP_NAME}}</span>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:0;color:rgba(255,255,255,0.85);font-size:14px;font-weight:500;">Email Verification</p>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td class="email-body" style="padding:48px 48px 36px;text-align:center;">
+
+            <h1 style="margin:0 0 12px;font-size:24px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">Verify your email address</h1>
+            <p style="margin:0 0 32px;font-size:15px;color:#64748b;line-height:1.75;max-width:420px;display:inline-block;">
+              Hi <strong style="color:#1e293b;">{{name}}</strong>, enter the code below to verify your email and complete your registration.
+            </p>
+
+            <!-- OTP Box -->
+            <div style="margin:0 auto 12px;display:inline-block;">
+              <div class="otp-box" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #86efac;border-radius:16px;padding:24px 40px;text-align:center;">
+                <p style="margin:0 0 6px;font-size:11px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:2px;">Your verification code</p>
+                <p style="margin:0;font-size:44px;font-weight:900;color:#15803d;letter-spacing:16px;font-family:'Courier New',monospace;">{{otp}}</p>
+              </div>
+            </div>
+
+            <p style="margin:0 0 28px;font-size:13px;color:#94a3b8;line-height:1.6;">
+              This code expires in <strong style="color:#64748b;">10 minutes</strong>. Do not share it with anyone.
+            </p>
+
+            <!-- Warning -->
+            <div style="background:#fff5f5;border:1px solid #fecaca;border-left:4px solid #ef4444;border-radius:0 12px 12px 0;padding:14px 20px;text-align:left;margin-bottom:8px;">
+              <p style="margin:0 0 3px;font-size:12px;font-weight:700;color:#dc2626;">Did not create an account?</p>
+              <p style="margin:0;font-size:12px;color:#ef4444;line-height:1.6;">
+                If you did not register on {{APP_NAME}}, please ignore this email. No account will be created.
+              </p>
+            </div>
+
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td class="email-footer" style="background:#f8fafc;border-top:1px solid #f1f5f9;padding:22px 48px;">
+            <table cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td style="vertical-align:middle;">
+                  <p style="margin:0 0 3px;font-size:12px;font-weight:700;color:#64748b;">{{APP_NAME}}</p>
+                  <p style="margin:0;font-size:11px;color:#cbd5e1;">© {{YEAR}} · Code expires in 10 minutes</p>
+                </td>
+                <td align="right" style="vertical-align:middle;">
+                  <a href="{{APP_URL}}" style="font-size:11px;color:#16a34a;text-decoration:none;">{{APP_URL}}</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

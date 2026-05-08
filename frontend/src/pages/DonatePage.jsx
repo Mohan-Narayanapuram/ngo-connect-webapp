@@ -21,7 +21,6 @@ export default function DonatePage() {
   const navigate    = useNavigate();
   const location    = useLocation();
 
-  // If came from NgoProfile, go back there. Otherwise fallback to /ngo/:id
   const backTo = location.state?.from || `/ngo/${ngoId}`;
 
   const [ngo, setNgo]               = useState(null);
@@ -57,7 +56,7 @@ export default function DonatePage() {
       await API.post('/api/donate', {
         ngoId,
         campaignId: campaignId || undefined,
-        amount: Number(amount),
+        amount:     Number(amount),
         paymentMethod: method,
       }, {
         headers: { Authorization: `Bearer ${user.token}` },
@@ -84,7 +83,10 @@ export default function DonatePage() {
       <Navbar />
       <div className="flex flex-col items-center justify-center h-64 gap-4">
         <p className="text-red-500">{error}</p>
-        <Link to="/discover" className="text-green-600 hover:underline text-sm">← Back to NGOs</Link>
+        <Link to="/discover" className="text-green-600 hover:underline text-sm">
+          <Icon name="arrow-left" size={13} className="inline mr-1" />
+          Back to NGOs
+        </Link>
       </div>
     </div>
   );
@@ -99,7 +101,7 @@ export default function DonatePage() {
 
       <div className="max-w-4xl mx-auto px-6 py-8">
 
-        {/* ── Back button — goes to NgoProfile, never loops ── */}
+        {/* Back button */}
         <button
           onClick={() => navigate(backTo)}
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-800 mb-6 transition-colors group"
@@ -158,7 +160,9 @@ export default function DonatePage() {
                     </div>
                     <p className="text-sm font-bold text-gray-900 mb-1">{campaign.title}</p>
                     {campaign.description && (
-                      <p className="text-xs text-gray-400 mb-3 leading-relaxed line-clamp-2">{campaign.description}</p>
+                      <p className="text-xs text-gray-400 mb-3 leading-relaxed line-clamp-2">
+                        {campaign.description}
+                      </p>
                     )}
                     <div className="flex justify-between text-xs text-gray-400 mb-1">
                       <span>₹{(campaign.raised || 0).toLocaleString('en-IN')} raised</span>
@@ -199,22 +203,36 @@ export default function DonatePage() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
 
+              {/* ── Step 3: Success ── */}
               {step === 3 ? (
                 <div className="flex flex-col items-center py-8 text-center">
                   <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
                     <Icon name="circle-check" size={40} className="text-green-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Thank you, {user?.name}! 🎉</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    Thank you, {user?.name}!
+                  </h2>
                   <p className="text-gray-400 mb-1">
                     Your donation of{' '}
-                    <span className="font-bold text-green-600">₹{Number(amount).toLocaleString('en-IN')}</span>
+                    <span className="font-bold text-green-600">
+                      ₹{Number(amount).toLocaleString('en-IN')}
+                    </span>
                     {campaign ? (
                       <> to <span className="font-semibold text-gray-700">{campaign.title}</span></>
                     ) : (
                       <> to <span className="font-semibold text-gray-700">{ngo?.name}</span></>
                     )}{' '}was successful.
                   </p>
-                  <p className="text-sm text-gray-400 mb-8">A receipt has been sent to your email.</p>
+                  <p className="text-sm text-gray-400 mb-3">
+                    A receipt has been sent to your email.
+                  </p>
+
+                  {/* Email confirmation pill */}
+                  <div className="inline-flex items-center gap-2 bg-green-50 border border-green-100 text-green-700 text-xs font-semibold px-4 py-2 rounded-full mb-8">
+                    <Icon name="mail-check" size={13} />
+                    Receipt sent to your registered email
+                  </div>
+
                   <div className="flex flex-col sm:flex-row gap-3">
                     <Link to="/dashboard"
                       className="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors">
@@ -223,10 +241,12 @@ export default function DonatePage() {
                     </Link>
                     <Link to="/discover"
                       className="inline-flex items-center justify-center gap-2 border border-gray-200 text-gray-700 px-6 py-2.5 rounded-xl text-sm font-semibold hover:border-gray-400 transition-colors">
+                      <Icon name="search" size={15} />
                       Discover More NGOs
                     </Link>
                   </div>
                 </div>
+
               ) : (
                 <>
                   {/* Step indicator */}
@@ -255,7 +275,7 @@ export default function DonatePage() {
                     </div>
                   )}
 
-                  {/* Step 1 — Amount */}
+                  {/* ── Step 1: Amount ── */}
                   {step === 1 && (
                     <div>
                       <h2 className="text-xl font-bold text-gray-900 mb-1">Choose amount</h2>
@@ -307,13 +327,18 @@ export default function DonatePage() {
                     </div>
                   )}
 
-                  {/* Step 2 — Payment */}
+                  {/* ── Step 2: Payment ── */}
                   {step === 2 && (
                     <div>
                       <h2 className="text-xl font-bold text-gray-900 mb-1">Payment method</h2>
                       <p className="text-sm text-gray-400 mb-6">
-                        Donating <span className="font-bold text-green-600">₹{Number(amount).toLocaleString('en-IN')}</span>
-                        {campaign ? <> to <span className="font-medium text-gray-700">{campaign.title}</span></> : ''}
+                        Donating{' '}
+                        <span className="font-bold text-green-600">
+                          ₹{Number(amount).toLocaleString('en-IN')}
+                        </span>
+                        {campaign ? (
+                          <> to <span className="font-medium text-gray-700">{campaign.title}</span></>
+                        ) : ''}
                       </p>
 
                       <div className="space-y-3 mb-6">
@@ -368,9 +393,19 @@ export default function DonatePage() {
                         </div>
                       )}
 
+                      {/* Simulation disclaimer */}
+                      <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 mb-5">
+                        <Icon name="shield" size={15} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-amber-700 leading-relaxed">
+                          <span className="font-bold">This is a simulation.</span> No real money will be deducted from your account.
+                          If you still have doubts, choose the <span className="font-semibold">Wallet</span> option — it uses only virtual balance.
+                        </p>
+                      </div>
+
                       <div className="flex gap-3">
                         <button onClick={() => setStep(1)}
-                          className="flex-1 border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold text-sm hover:border-gray-400 transition-colors">
+                          className="flex-1 border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold text-sm hover:border-gray-400 transition-colors flex items-center justify-center gap-2">
+                          <Icon name="arrow-left" size={14} />
                           Back
                         </button>
                         <button onClick={handleDonate} disabled={submitting}
@@ -381,7 +416,7 @@ export default function DonatePage() {
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
                               </svg>
-                              Processing...
+                              Processing…
                             </>
                           ) : (
                             <>
@@ -395,6 +430,7 @@ export default function DonatePage() {
                   )}
                 </>
               )}
+
             </div>
           </div>
         </div>

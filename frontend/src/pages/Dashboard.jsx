@@ -15,7 +15,7 @@ function useCountUp(target, duration = 900) {
     const step = (ts) => {
       if (!start) start = ts;
       const progress = Math.min((ts - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+      const eased = 1 - Math.pow(1 - progress, 3);
       setValue(Math.floor(eased * target));
       if (progress < 1) requestAnimationFrame(step);
       else setValue(target);
@@ -25,12 +25,129 @@ function useCountUp(target, duration = 900) {
   return value;
 }
 
+// ── Build receipt HTML ─────────────────────────────────────────────
+function buildReceiptHTML({ donation, dateStr, timeStr, txnId, amount }) {
+  const ngoName       = donation.ngoId?.name   || 'Unknown NGO';
+  const ngoCause      = donation.ngoId?.cause  || '—';
+  const campaign      = donation.campaignTitle || 'General Donation';
+  const paymentMethod = (donation.paymentMethod || 'Card').toUpperCase();
+  const receiptNo     = txnId?.slice(-8) || 'N/A';
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:794px; background:#fff; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; color:#1a1a1a; }
+  .page { width:794px; min-height:1123px; }
+
+  /* HEADER */
+  .header-bar { background:#16a34a; padding:32px 60px 28px; overflow:hidden; }
+  .header-brand { float:left; color:#fff; font-size:20px; font-weight:800; letter-spacing:-0.3px; }
+  .header-brand span { display:block; font-size:11px; font-weight:500; opacity:0.75; margin-top:2px; }
+  .header-right { float:right; text-align:right; }
+  .header-right p { color:rgba(255,255,255,0.8); font-size:11px; line-height:1.7; }
+  .receipt-no { color:#fff; font-size:12px; font-weight:700; letter-spacing:0.5px; }
+
+  /* AMOUNT HERO */
+  .amount-section { background:#f0fdf4; padding:36px 60px 32px; border-bottom:1px solid #dcfce7; overflow:hidden; }
+  .amount-left { float:left; }
+  .amount-left p { font-size:11px; font-weight:700; color:#16a34a; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+  .big-amount { font-size:48px; font-weight:900; color:#15803d; letter-spacing:-2px; line-height:1; }
+  .amount-right { float:right; padding-top:10px; }
+  .status-pill { display:inline-block; background:#16a34a; color:#fff; font-size:13px; font-weight:700; padding:10px 20px; border-radius:999px; white-space:nowrap; }
+  .status-dot { display:inline-block; width:8px; height:8px; background:#bbf7d0; border-radius:50%; margin-right:6px; vertical-align:middle; position:relative; top:-1px; }
+
+  /* BODY */
+  .body { padding:36px 60px; }
+  .section { margin-bottom:28px; }
+  .section-title { font-size:10px; font-weight:700; color:#9ca3af; letter-spacing:2px; text-transform:uppercase; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid #f3f4f6; }
+
+  /* TABLE */
+  .info-table { width:100%; border-collapse:collapse; }
+  .info-table tr td { padding:10px 0; border-bottom:1px solid #f9fafb; vertical-align:middle; }
+  .info-table tr:last-child td { border-bottom:none; }
+  .lbl { font-size:13px; color:#6b7280; font-weight:400; width:45%; }
+  .val { font-size:13px; color:#111827; font-weight:600; text-align:right; }
+  .val.mono { font-family:"Courier New",monospace; font-size:11px; color:#6b7280; font-weight:400; word-break:break-all; }
+
+  /* FOOTER */
+  .footer { border-top:1px solid #f3f4f6; padding:24px 60px 32px; overflow:hidden; }
+  .footer-left { float:left; }
+  .footer-left p { font-size:11px; color:#d1d5db; line-height:1.8; }
+  .footer-left .sub { margin-top:4px; color:#9ca3af; font-size:10px; }
+  .disclaimer { float:right; background:#fffbeb; border:1px solid #fde68a; color:#92400e; font-size:10px; font-weight:600; padding:8px 14px; border-radius:6px; text-align:center; max-width:200px; line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header-bar">
+    <div class="header-brand">
+      NGO Connect
+      <span>Donation Platform</span>
+    </div>
+    <div class="header-right">
+      <p class="receipt-no">RECEIPT #${receiptNo}</p>
+      <p>${dateStr} &nbsp;&middot;&nbsp; ${timeStr}</p>
+    </div>
+  </div>
+
+  <div class="amount-section">
+    <div class="amount-left">
+      <p>Amount Donated</p>
+      <div class="big-amount">&#8377;${amount}</div>
+    </div>
+    <div class="amount-right">
+      <div class="status-pill">
+        <span class="status-dot"></span>Payment Successful
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="section">
+      <div class="section-title">Donation Details</div>
+      <table class="info-table">
+        <tr><td class="lbl">Organisation</td><td class="val">${ngoName}</td></tr>
+        <tr><td class="lbl">Cause</td><td class="val">${ngoCause}</td></tr>
+        <tr><td class="lbl">Campaign</td><td class="val">${campaign}</td></tr>
+        <tr><td class="lbl">Payment Method</td><td class="val">${paymentMethod}</td></tr>
+      </table>
+    </div>
+    <div class="section">
+      <div class="section-title">Transaction Info</div>
+      <table class="info-table">
+        <tr><td class="lbl">Date</td><td class="val">${dateStr}</td></tr>
+        <tr><td class="lbl">Time</td><td class="val">${timeStr}</td></tr>
+        <tr><td class="lbl">Transaction ID</td><td class="val mono">${txnId}</td></tr>
+        <tr><td class="lbl">Platform</td><td class="val">NGO Connect</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-left">
+      <p>NGO Connect &nbsp;&middot;&nbsp; ngoconnect.platform@gmail.com</p>
+      <p>Receipt generated on ${dateStr} at ${timeStr}</p>
+      <p class="sub">This receipt is system generated and does not require a signature.</p>
+    </div>
+    <div class="disclaimer">
+      Simulated donation —<br/>no real money was deducted
+    </div>
+  </div>
+
+</div>
+</body>
+</html>`;
+}
 
 // ── Donation Detail Modal ──────────────────────────────────────────
 function DonationModal({ donation, onClose }) {
   const ref = useRef(null);
+  const [downloading, setDownloading] = useState(false);
 
-  // Close on Escape key
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handler);
@@ -42,16 +159,73 @@ function DonationModal({ donation, onClose }) {
   }, [onClose]);
 
   if (!donation) return null;
-  const date = new Date(donation.createdAt);
+
+  const date          = new Date(donation.createdAt);
+  const formattedDate = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  const formattedTime = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  const amount        = donation.amount?.toLocaleString('en-IN');
+  const txnId         = donation._id?.toUpperCase();
 
   const rows = [
     { label: 'NGO',            value: donation.ngoId?.name || 'Unknown NGO', bold: true },
     { label: 'Cause',          value: donation.ngoId?.cause || '—' },
-    { label: 'Campaign',       value: donation.campaignTitle || 'General donation' },
-    { label: 'Date',           value: date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) },
-    { label: 'Time',           value: date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) },
-    { label: 'Transaction ID', value: donation._id?.slice(-10).toUpperCase(), mono: true },
+    { label: 'Campaign',       value: donation.campaignTitle || 'General Donation' },
+    { label: 'Payment Method', value: donation.paymentMethod || 'Card' },
+    { label: 'Date',           value: formattedDate },
+    { label: 'Time',           value: formattedTime },
+    { label: 'Transaction ID', value: txnId, mono: true },
   ];
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      const html = buildReceiptHTML({
+        donation,
+        dateStr: formattedDate,
+        timeStr: formattedTime,
+        txnId,
+        amount,
+      });
+
+      const iframe = document.createElement('iframe');
+      iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;height:1123px;border:none;';
+      document.body.appendChild(iframe);
+
+      iframe.contentDocument.open();
+      iframe.contentDocument.write(html);
+      iframe.contentDocument.close();
+
+      await new Promise(r => setTimeout(r, 700));
+
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ]);
+
+      const body   = iframe.contentDocument.body;
+      const canvas = await html2canvas(body, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        width: 794,
+        height: body.scrollHeight,
+        windowWidth: 794,
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf     = new jsPDF({ unit: 'px', format: 'a4', orientation: 'portrait' });
+      const pdfW    = pdf.internal.pageSize.getWidth();
+      const pdfH    = (canvas.height * pdfW) / canvas.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
+      pdf.save(`NGOConnect-Receipt-${txnId?.slice(-8)}.pdf`);
+
+      document.body.removeChild(iframe);
+    } catch (err) {
+      console.error('PDF error:', err);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <div
@@ -62,13 +236,11 @@ function DonationModal({ donation, onClose }) {
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
       <div
         ref={ref}
-        className="relative bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl z-10 overflow-hidden fade-in"
-        onClick={e => e.stopPropagation()}
+        className="relative bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl z-10 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Green accent top bar */}
         <div className="h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500" />
 
-        {/* Header */}
         <div className="flex items-start justify-between px-6 pt-5 pb-4 border-b border-gray-100">
           <div>
             <p className="text-xs font-bold text-green-600 uppercase tracking-widest mb-1">Donation Receipt</p>
@@ -82,12 +254,15 @@ function DonationModal({ donation, onClose }) {
           </button>
         </div>
 
-        {/* Details */}
         <div className="px-6 py-4 space-y-3">
           {rows.map(({ label, value, bold, mono }) => (
             <div key={label} className="flex items-start justify-between gap-4">
               <span className="text-xs text-gray-400 font-medium flex-shrink-0 pt-0.5">{label}</span>
-              <span className={`text-sm text-right ${bold ? 'font-bold text-gray-900' : 'font-medium text-gray-700'} ${mono ? 'font-mono text-xs text-gray-500' : ''}`}>
+              <span className={[
+                'text-sm text-right break-all',
+                bold ? 'font-bold text-gray-900' : 'font-medium text-gray-700',
+                mono ? 'font-mono text-xs text-gray-500' : '',
+              ].join(' ')}>
                 {value}
               </span>
             </div>
@@ -101,21 +276,26 @@ function DonationModal({ donation, onClose }) {
           </div>
         </div>
 
-        {/* Actions */}
         <div className="px-6 pb-6 pt-2 flex flex-col sm:flex-row gap-2">
-          <Link
-            to={`/ngo/${donation.ngoId?._id}`}
-            onClick={onClose}
-            className="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-gray-700 py-2.5 rounded-xl text-sm font-semibold hover:border-green-400 hover:text-green-700 hover:bg-green-50 transition-all"
-          >
-            <Icon name="building-2" size={14} />
-            View NGO
-          </Link>
-          <Link
-            to={`/donate/${donation.ngoId?._id}`}
-            onClick={onClose}
-            className="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-green-700 active:scale-95 transition-all"
-          >
+          <button onClick={handleDownload} disabled={downloading}
+            className="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-gray-700 py-2.5 rounded-xl text-sm font-semibold hover:border-green-400 hover:text-green-700 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+            {downloading ? (
+              <>
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                </svg>
+                Generating…
+              </>
+            ) : (
+              <>
+                <Icon name="download" size={14} />
+                Download PDF
+              </>
+            )}
+          </button>
+          <Link to={`/donate/${donation.ngoId?._id}`} onClick={onClose}
+            className="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-green-700 active:scale-95 transition-all">
             <Icon name="heart" size={14} />
             Donate Again
           </Link>
@@ -125,10 +305,9 @@ function DonationModal({ donation, onClose }) {
   );
 }
 
-
 // ── Edit Profile Modal ─────────────────────────────────────────────
 function EditProfileModal({ profile, token, onClose, onSaved }) {
-  const [name, setName]           = useState(profile?.name || '');
+  const [name, setName]           = useState(profile?.name  || '');
   const [email, setEmail]         = useState(profile?.email || '');
   const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw]         = useState('');
@@ -184,19 +363,12 @@ function EditProfileModal({ profile, token, onClose, onSaved }) {
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
-      onClick={onClose}
-      role="dialog" aria-modal="true" aria-label="Edit profile"
-    >
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      onClick={onClose} role="dialog" aria-modal="true" aria-label="Edit profile">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-      <div
-        className="relative bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl z-10 overflow-hidden fade-in"
-        onClick={e => e.stopPropagation()}
-      >
+      <div className="relative bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl shadow-2xl z-10 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}>
         <div className="h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500" />
-
-        {/* Header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-100">
           <h2 className="text-base font-black text-gray-900">Edit Profile</h2>
           <button onClick={onClose} aria-label="Close"
@@ -204,8 +376,6 @@ function EditProfileModal({ profile, token, onClose, onSaved }) {
             <Icon name="x" size={16} />
           </button>
         </div>
-
-        {/* Tabs */}
         <div className="flex gap-1 px-6 pt-4">
           {[['profile', 'Profile Info'], ['password', 'Change Password']].map(([key, label]) => (
             <button key={key}
@@ -217,32 +387,28 @@ function EditProfileModal({ profile, token, onClose, onSaved }) {
             </button>
           ))}
         </div>
-
         <div className="px-6 py-5">
-          {error   && (
+          {error && (
             <div className="flex items-center gap-2 text-xs text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2.5 mb-4">
-              <Icon name="circle-alert" size={13} className="flex-shrink-0" />
-              {error}
+              <Icon name="circle-alert" size={13} className="flex-shrink-0" />{error}
             </div>
           )}
           {success && (
             <div className="flex items-center gap-2 text-xs text-green-700 bg-green-50 border border-green-100 rounded-xl px-3 py-2.5 mb-4">
-              <Icon name="circle-check" size={13} className="flex-shrink-0" />
-              {success}
+              <Icon name="circle-check" size={13} className="flex-shrink-0" />{success}
             </div>
           )}
-
           {tab === 'profile' ? (
             <form onSubmit={handleSaveProfile} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Full Name</label>
-                <input type="text" value={name} onChange={e => setName(e.target.value)} required
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent bg-gray-50 transition-shadow" />
+                <input type="text" value={name} onChange={(e) => setName(e.target.value)} required
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent bg-gray-50" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Email Address</label>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent bg-gray-50 transition-shadow" />
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent bg-gray-50" />
               </div>
               <button type="submit" disabled={saving}
                 className="w-full bg-green-600 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-green-700 disabled:opacity-60 active:scale-95 transition-all">
@@ -252,16 +418,16 @@ function EditProfileModal({ profile, token, onClose, onSaved }) {
           ) : (
             <form onSubmit={handleChangePassword} className="space-y-4">
               {[
-                { label: 'Current Password',     val: currentPw, set: setCurrentPw },
-                { label: 'New Password',          val: newPw,     set: setNewPw     },
-                { label: 'Confirm New Password',  val: confirmPw, set: setConfirmPw },
+                { label: 'Current Password',    val: currentPw, set: setCurrentPw },
+                { label: 'New Password',         val: newPw,     set: setNewPw     },
+                { label: 'Confirm New Password', val: confirmPw, set: setConfirmPw },
               ].map(({ label, val, set }) => (
                 <div key={label}>
                   <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">{label}</label>
                   <div className="relative">
-                    <input type={showPw ? 'text' : 'password'} value={val} onChange={e => set(e.target.value)} required
-                      className="w-full border border-gray-200 rounded-xl px-4 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent bg-gray-50 transition-shadow" />
-                    <button type="button" onClick={() => setShowPw(p => !p)}
+                    <input type={showPw ? 'text' : 'password'} value={val} onChange={(e) => set(e.target.value)} required
+                      className="w-full border border-gray-200 rounded-xl px-4 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent bg-gray-50" />
+                    <button type="button" onClick={() => setShowPw((p) => !p)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors">
                       <Icon name={showPw ? 'eye-off' : 'eye'} size={14} />
                     </button>
@@ -280,16 +446,14 @@ function EditProfileModal({ profile, token, onClose, onSaved }) {
   );
 }
 
-
-// ── Avatar initials helper ─────────────────────────────────────────
+// ── Avatar initials ────────────────────────────────────────────────
 function getInitials(name = '') {
-  return name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
+  return name.trim().split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase() || '?';
 }
-
 
 // ── Main Dashboard ─────────────────────────────────────────────────
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [profile, setProfile]                   = useState(null);
@@ -312,28 +476,17 @@ export default function Dashboard() {
   }, [user]);
 
   const totalDonated  = donations.reduce((sum, d) => sum + (d.amount || 0), 0);
-  const ngosSupported = new Set(donations.map(d => d.ngoId?._id).filter(Boolean)).size;
+  const ngosSupported = new Set(donations.map((d) => d.ngoId?._id).filter(Boolean)).size;
 
-  // Animated stat counters
-  const animatedTotal  = useCountUp(totalDonated);
-  const animatedNgos   = useCountUp(ngosSupported);
-  const animatedCount  = useCountUp(donations.length);
+  const animatedTotal = useCountUp(totalDonated);
+  const animatedNgos  = useCountUp(ngosSupported);
+  const animatedCount = useCountUp(donations.length);
 
-  // Grouping by month
-  const grouped = donations.reduce((acc, d) => {
-    const key = new Date(d.createdAt).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(d);
-    return acc;
-  }, {});
-
-  // Filter options
-  const uniqueNgos = [...new Set(donations.map(d => d.ngoId?.name).filter(Boolean))];
+  const uniqueNgos = [...new Set(donations.map((d) => d.ngoId?.name).filter(Boolean))];
   const filteredDonations = filter === 'all'
     ? donations
-    : donations.filter(d => d.ngoId?.name === filter);
+    : donations.filter((d) => d.ngoId?.name === filter);
 
-  // Filtered grouped
   const filteredGrouped = filteredDonations.reduce((acc, d) => {
     const key = new Date(d.createdAt).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
     if (!acc[key]) acc[key] = [];
@@ -341,45 +494,37 @@ export default function Dashboard() {
     return acc;
   }, {});
 
-  // ── Loading skeleton ──
   if (loading) return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="w-full max-w-5xl mx-auto px-6 lg:px-10 py-10">
-        {/* Header skeleton */}
         <div className="flex items-start justify-between mb-8">
           <div className="flex items-center gap-4">
-            <div className="skeleton w-14 h-14 rounded-2xl" />
+            <div className="w-14 h-14 rounded-2xl bg-gray-200 animate-pulse" />
             <div>
-              <div className="skeleton h-3 w-20 mb-2 rounded" />
-              <div className="skeleton h-6 w-36 mb-1.5 rounded" />
-              <div className="skeleton h-3 w-28 rounded" />
+              <div className="h-3 w-20 bg-gray-200 animate-pulse rounded mb-2" />
+              <div className="h-6 w-36 bg-gray-200 animate-pulse rounded mb-1.5" />
+              <div className="h-3 w-28 bg-gray-200 animate-pulse rounded" />
             </div>
           </div>
-          <div className="skeleton h-9 w-28 rounded-xl" />
+          <div className="h-9 w-28 bg-gray-200 animate-pulse rounded-xl" />
         </div>
-        {/* Stats skeleton */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          {[1,2,3].map(i => <div key={i} className="skeleton h-24 rounded-2xl" />)}
+          {[1,2,3].map((i) => <div key={i} className="h-24 bg-gray-200 animate-pulse rounded-2xl" />)}
         </div>
-        {/* Table skeleton */}
         <div className="bg-white rounded-2xl border border-gray-100">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-            <div className="skeleton h-4 w-32 rounded" />
-            <div className="skeleton h-4 w-20 rounded" />
-          </div>
-          {[1,2,3,4].map(i => (
+          {[1,2,3,4].map((i) => (
             <div key={i} className="flex items-center justify-between px-6 py-4 border-b border-gray-50">
               <div className="flex items-center gap-4">
-                <div className="skeleton w-10 h-10 rounded-xl flex-shrink-0" />
+                <div className="w-10 h-10 bg-gray-200 animate-pulse rounded-xl" />
                 <div>
-                  <div className="skeleton h-3.5 w-36 mb-2 rounded" />
-                  <div className="skeleton h-3 w-24 rounded" />
+                  <div className="h-3.5 w-36 bg-gray-200 animate-pulse rounded mb-2" />
+                  <div className="h-3 w-24 bg-gray-200 animate-pulse rounded" />
                 </div>
               </div>
               <div className="text-right">
-                <div className="skeleton h-4 w-20 mb-1.5 rounded" />
-                <div className="skeleton h-3 w-16 rounded" />
+                <div className="h-4 w-20 bg-gray-200 animate-pulse rounded mb-1.5" />
+                <div className="h-3 w-16 bg-gray-200 animate-pulse rounded" />
               </div>
             </div>
           ))}
@@ -396,13 +541,11 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
-
       <main className="flex-1 w-full max-w-5xl mx-auto px-6 lg:px-10 py-10">
 
-        {/* ── Page Header ── */}
+        {/* Header */}
         <div className="flex items-start justify-between mb-8 gap-4">
           <div className="flex items-center gap-4">
-            {/* Large avatar */}
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-green-100">
               <span className="text-white text-lg font-black">{getInitials(displayName)}</span>
             </div>
@@ -422,7 +565,6 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
-
           <div className="flex items-center gap-2 flex-shrink-0">
             <button onClick={() => setEditOpen(true)}
               className="inline-flex items-center gap-1.5 border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-xs font-bold hover:border-green-400 hover:text-green-700 hover:bg-green-50 transition-all">
@@ -437,51 +579,19 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ── Stats ── */}
+        {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           {[
-            {
-              label:    'Total Donated',
-              value:    `₹${animatedTotal.toLocaleString('en-IN')}`,
-              raw:      totalDonated,
-              icon:     'indian-rupee',
-              iconBg:   'bg-green-100',
-              iconText: 'text-green-600',
-              accent:   'border-green-100',
-              hint:     donations.length > 0 ? `Across ${ngosSupported} NGO${ngosSupported !== 1 ? 's' : ''}` : 'No donations yet',
-            },
-            {
-              label:    'NGOs Supported',
-              value:    animatedNgos,
-              raw:      ngosSupported,
-              icon:     'building-2',
-              iconBg:   'bg-blue-100',
-              iconText: 'text-blue-600',
-              accent:   'border-blue-100',
-              hint:     ngosSupported > 0 ? 'Unique organisations' : 'Make your first donation',
-            },
-            {
-              label:    'Donations Made',
-              value:    animatedCount,
-              raw:      donations.length,
-              icon:     'heart',
-              iconBg:   'bg-purple-100',
-              iconText: 'text-purple-600',
-              accent:   'border-purple-100',
-              hint:     donations.length > 0
-                ? `Last: ${new Date(donations[0]?.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`
-                : 'Start contributing',
-            },
+            { label:'Total Donated',  value:`₹${animatedTotal.toLocaleString('en-IN')}`, icon:'indian-rupee', iconBg:'bg-green-100',  iconText:'text-green-600',  accent:'border-green-100',  hint: donations.length > 0 ? `Across ${ngosSupported} NGO${ngosSupported!==1?'s':''}` : 'No donations yet' },
+            { label:'NGOs Supported', value:animatedNgos,                                icon:'building-2',   iconBg:'bg-blue-100',   iconText:'text-blue-600',   accent:'border-blue-100',   hint: ngosSupported > 0 ? 'Unique organisations' : 'Make your first donation' },
+            { label:'Donations Made', value:animatedCount,                               icon:'heart',        iconBg:'bg-purple-100', iconText:'text-purple-600', accent:'border-purple-100', hint: donations.length > 0 ? `Last: ${new Date(donations[0]?.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}` : 'Start contributing' },
           ].map((stat, i) => (
-            <div key={i}
-              className={`bg-white rounded-2xl border ${stat.accent} p-5 flex items-center gap-4 hover:shadow-sm transition-shadow`}>
+            <div key={i} className={`bg-white rounded-2xl border ${stat.accent} p-5 flex items-center gap-4 hover:shadow-sm transition-shadow`}>
               <div className={`w-12 h-12 ${stat.iconBg} ${stat.iconText} rounded-2xl flex items-center justify-center flex-shrink-0`}>
                 <Icon name={stat.icon} size={22} />
               </div>
               <div className="min-w-0">
-                <p className="text-2xl font-black text-gray-900 tracking-tight leading-none tabular-nums">
-                  {stat.value}
-                </p>
+                <p className="text-2xl font-black text-gray-900 tracking-tight leading-none tabular-nums">{stat.value}</p>
                 <p className="text-xs font-semibold text-gray-500 mt-1">{stat.label}</p>
                 <p className="text-xs text-gray-400 mt-0.5">{stat.hint}</p>
               </div>
@@ -489,33 +599,24 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* ── Donation History ── */}
+        {/* Donation History */}
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-          {/* Table header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 border-b border-gray-100">
             <div>
               <h2 className="text-sm font-black text-gray-900">Donation History</h2>
               <p className="text-xs text-gray-400 mt-0.5">
-                {donations.length === 0 ? 'No donations yet' : `${donations.length} donation${donations.length !== 1 ? 's' : ''} · ₹${totalDonated.toLocaleString('en-IN')} total`}
+                {donations.length === 0 ? 'No donations yet' : `${donations.length} donation${donations.length!==1?'s':''} · ₹${totalDonated.toLocaleString('en-IN')} total`}
               </p>
             </div>
-
-            {/* NGO filter */}
             {uniqueNgos.length > 1 && (
               <div className="flex items-center gap-1.5 flex-wrap">
-                <button
-                  onClick={() => setFilter('all')}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                    filter === 'all' ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'
-                  }`}>
+                <button onClick={() => setFilter('all')}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${filter==='all'?'bg-gray-900 text-white':'text-gray-500 hover:bg-gray-100'}`}>
                   All
                 </button>
-                {uniqueNgos.slice(0, 4).map(name => (
-                  <button key={name}
-                    onClick={() => setFilter(name)}
-                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors max-w-[120px] truncate ${
-                      filter === name ? 'bg-green-600 text-white' : 'text-gray-500 hover:bg-gray-100'
-                    }`}>
+                {uniqueNgos.slice(0,4).map((name) => (
+                  <button key={name} onClick={() => setFilter(name)}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors max-w-[120px] truncate ${filter===name?'bg-green-600 text-white':'text-gray-500 hover:bg-gray-100'}`}>
                     {name}
                   </button>
                 ))}
@@ -523,7 +624,6 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Empty state */}
           {donations.length === 0 ? (
             <div className="flex flex-col items-center py-20 text-center px-6">
               <div className="w-16 h-16 bg-gray-50 border border-gray-100 rounded-2xl flex items-center justify-center mb-4">
@@ -549,35 +649,30 @@ export default function Dashboard() {
             <div>
               {Object.entries(filteredGrouped).map(([month, items]) => (
                 <div key={month}>
-                  {/* Month separator */}
                   <div className="px-6 py-2.5 bg-gray-50/70 border-b border-gray-100 flex items-center gap-2">
                     <Icon name="calendar" size={11} className="text-gray-300" />
                     <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{month}</span>
                     <span className="ml-auto text-xs font-semibold text-gray-400">
-                      ₹{items.reduce((s, d) => s + d.amount, 0).toLocaleString('en-IN')}
+                      ₹{items.reduce((s,d) => s+d.amount, 0).toLocaleString('en-IN')}
                     </span>
                   </div>
-                  {/* Rows */}
                   {items.map((d, i) => {
                     const date = new Date(d.createdAt);
                     return (
-                      <div key={d._id || i}
+                      <div key={d._id||i}
                         className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer group border-b border-gray-50 last:border-0"
                         onClick={() => setSelectedDonation(d)}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={e => e.key === 'Enter' && setSelectedDonation(d)}
+                        role="button" tabIndex={0}
+                        onKeyDown={(e) => e.key==='Enter' && setSelectedDonation(d)}
                       >
                         <div className="flex items-center gap-4 min-w-0">
                           <div className="w-10 h-10 bg-green-50 group-hover:bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors">
                             <Icon name="heart" size={15} className="text-green-500" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-bold text-gray-900 truncate">{d.ngoId?.name || 'NGO'}</p>
+                            <p className="text-sm font-bold text-gray-900 truncate">{d.ngoId?.name||'NGO'}</p>
                             <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                              {d.ngoId?.cause && (
-                                <span className="text-xs text-gray-400">{d.ngoId.cause}</span>
-                              )}
+                              {d.ngoId?.cause && <span className="text-xs text-gray-400">{d.ngoId.cause}</span>}
                               {d.campaignTitle && (
                                 <>
                                   <span className="text-gray-200 text-xs">·</span>
@@ -587,44 +682,33 @@ export default function Dashboard() {
                             </div>
                           </div>
                         </div>
-
                         <div className="flex items-center gap-3 flex-shrink-0 ml-4">
                           <div className="text-right">
-                            <p className="text-sm font-black text-gray-900 tabular-nums">
-                              ₹{d.amount?.toLocaleString('en-IN')}
-                            </p>
+                            <p className="text-sm font-black text-gray-900 tabular-nums">₹{d.amount?.toLocaleString('en-IN')}</p>
                             <p className="text-xs text-gray-400 mt-0.5">
-                              {date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                              {' · '}
-                              {date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                              {date.toLocaleDateString('en-IN',{day:'numeric',month:'short'})} · {date.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}
                             </p>
                           </div>
-                          <Icon name="chevron-right" size={14}
-                            className="text-gray-200 group-hover:text-green-500 group-hover:translate-x-0.5 transition-all" />
+                          <Icon name="chevron-right" size={14} className="text-gray-200 group-hover:text-green-500 group-hover:translate-x-0.5 transition-all" />
                         </div>
                       </div>
                     );
                   })}
                 </div>
               ))}
-
-              {/* Footer total */}
               <div className="flex items-center justify-between px-6 py-4 bg-gray-50/60 border-t border-gray-100">
                 <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                  {filteredDonations.length} donation{filteredDonations.length !== 1 ? 's' : ''}
-                  {filter !== 'all' ? ` to ${filter}` : ' total'}
+                  {filteredDonations.length} donation{filteredDonations.length!==1?'s':''}{filter!=='all'?` to ${filter}`:' total'}
                 </span>
                 <span className="text-sm font-black text-gray-900 tabular-nums">
-                  ₹{filteredDonations.reduce((s, d) => s + d.amount, 0).toLocaleString('en-IN')}
+                  ₹{filteredDonations.reduce((s,d) => s+d.amount, 0).toLocaleString('en-IN')}
                 </span>
               </div>
             </div>
           )}
         </div>
-
       </main>
 
-      {/* Modals */}
       {selectedDonation && (
         <DonationModal donation={selectedDonation} onClose={() => setSelectedDonation(null)} />
       )}
@@ -636,7 +720,6 @@ export default function Dashboard() {
           onSaved={(updated) => { setProfile(updated); setEditOpen(false); }}
         />
       )}
-
       <Footer />
     </div>
   );

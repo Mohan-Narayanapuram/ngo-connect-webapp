@@ -1,16 +1,25 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import API from '../api';
 import Icon from '../components/Icon';
 import Navbar from '../components/Navbar';
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
-  const [sent, setSent] = useState(false);
+  const [form, setForm]       = useState({ name: '', email: '', subject: '', message: '' });
+  const [sent, setSent]       = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSent(true);
-    setForm({ name: '', email: '', subject: '', message: '' });
+    setLoading(true); setError('');
+    try {
+      await API.post('/api/contact', form);
+      setSent(true);
+      setForm({ name: '', email: '', subject: '', message: '' });
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to send message. Please try again.');
+    } finally { setLoading(false); }
   };
 
   return (
@@ -41,8 +50,8 @@ export default function Contact() {
                 <div>
                   <p className="font-semibold text-gray-900 text-sm">Email us</p>
                   <p className="text-xs text-gray-400 mt-0.5">Our team typically responds within 24 hours</p>
-                  <a href="mailto:hello@ngoconnect.org" className="text-sm text-green-600 font-medium mt-1 block hover:underline">
-                    hello@ngoconnect.org
+                  <a href="mailto:ngoconnect.platform@gmail.com" className="text-sm text-green-600 font-medium mt-1 block hover:underline">
+                    ngoconnect.platform@gmail.com
                   </a>
                 </div>
               </div>
@@ -54,8 +63,8 @@ export default function Contact() {
                 <div>
                   <p className="font-semibold text-gray-900 text-sm">For NGOs</p>
                   <p className="text-xs text-gray-400 mt-0.5">Interested in registering your organization?</p>
-                  <a href="mailto:ngos@ngoconnect.org" className="text-sm text-green-600 font-medium mt-1 block hover:underline">
-                    ngos@ngoconnect.org
+                  <a href="mailto:ngoconnect.platform@gmail.com" className="text-sm text-green-600 font-medium mt-1 block hover:underline">
+                    ngoconnect.platform@gmail.com
                   </a>
                 </div>
               </div>
@@ -93,10 +102,18 @@ export default function Contact() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+
+                {error && (
+                  <div className="flex items-start gap-2 bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl border border-red-100">
+                    <Icon name="circle-alert" size={14} className="flex-shrink-0 mt-0.5" />
+                    {error}
+                  </div>
+                )}
+
                 {[
-                  { label: 'Name', key: 'name', type: 'text', placeholder: 'Your name', icon: 'user' },
-                  { label: 'Email', key: 'email', type: 'email', placeholder: 'your@email.com', icon: 'mail' },
-                  { label: 'Subject', key: 'subject', type: 'text', placeholder: "What's this about?", icon: 'tag' },
+                  { label: 'Name',    key: 'name',    type: 'text',  placeholder: 'Your name',          icon: 'user' },
+                  { label: 'Email',   key: 'email',   type: 'email', placeholder: 'your@email.com',     icon: 'mail' },
+                  { label: 'Subject', key: 'subject', type: 'text',  placeholder: "What's this about?", icon: 'tag'  },
                 ].map(f => (
                   <div key={f.key}>
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5">{f.label}</label>
@@ -118,10 +135,12 @@ export default function Contact() {
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent resize-none" />
                 </div>
 
-                <button type="submit"
-                  className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors">
-                  <Icon name="send" size={15} />
-                  Send Message
+                <button type="submit" disabled={loading}
+                  className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all">
+                  {loading
+                    ? <><svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>Sending…</>
+                    : <><Icon name="send" size={15} />Send Message</>
+                  }
                 </button>
               </form>
             )}

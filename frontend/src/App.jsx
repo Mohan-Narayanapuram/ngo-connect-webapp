@@ -10,6 +10,7 @@ import Contact from './pages/Contact';
 import Dashboard from './pages/Dashboard';
 import DonatePage from './pages/DonatePage';
 import FAQ from './pages/FAQ';
+import ForgotPassword from './pages/ForgotPassword';
 import Home from './pages/Home';
 import CookiePolicy from './pages/LegalCookies';
 import PrivacyPolicy from './pages/LegalPrivacy';
@@ -19,7 +20,12 @@ import NgoList from './pages/NgoList';
 import NgoProfile from './pages/NgoProfile';
 import NotFound from './pages/NotFound';
 import Register from './pages/Register';
+import ResetPassword from './pages/ResetPassword';
 import UnderConstruction from './pages/UnderConstruction';
+import VerifyOtp from './pages/VerifyOtp';
+
+// Inside <Routes>:
+
 
 // Wraps all routes with a fade-in on every navigation
 function AnimatedRoutes() {
@@ -56,6 +62,9 @@ function AnimatedRoutes() {
         <Route path="/cookies"  element={<CookiePolicy />} />
         <Route path="/register-ngo" element={<UnderConstruction />} />
         <Route path="/logged-out" element={<LoggedOut />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password"  element={<ResetPassword />} />
 
         {/* Protected */}
         <Route path="/donate/:ngoId" element={
