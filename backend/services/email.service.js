@@ -3,10 +3,16 @@ const fs         = require('fs');
 const path       = require('path');
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host:       'smtp.gmail.com',
+  port:       587,
+  secure:     false,
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false,
   },
 });
 
@@ -20,21 +26,24 @@ const sendEmail = async ({ to, subject, templateName, variables = {} }) => {
     });
 
     html = html
-      .replaceAll('{{APP_NAME}}', process.env.APP_NAME || 'NGO Connect WebApp')
+      .replaceAll('{{APP_NAME}}', process.env.APP_NAME || 'NGO Connect')
       .replaceAll('{{APP_URL}}',  process.env.APP_URL  || 'https://ngo-connect-webapp.vercel.app')
       .replaceAll('{{YEAR}}',     new Date().getFullYear());
 
     await transporter.sendMail({
-      from: `"${process.env.APP_NAME || 'NGO Connect'}" <${process.env.EMAIL_USER}>`,
+      from:    `"${process.env.APP_NAME || 'NGO Connect'}" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,
     });
 
-    console.log(`Email sent → ${to} [${templateName}]`);
- } catch (err) {
-  console.error('EMAIL ERROR FULL:', err); // ← change this line, log full error not just message
-}
+    console.log(`✅ Email sent → ${to} [${templateName}]`);
+  } catch (err) {
+    console.error(`❌ Email failed → ${to} [${templateName}]`);
+    console.error('Error code    :', err.code);
+    console.error('Error message :', err.message);
+    console.error('Full error    :', err);
+  }
 };
 
 module.exports = { sendEmail };

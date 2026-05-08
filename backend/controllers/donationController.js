@@ -5,10 +5,6 @@ const { sendEmail } = require('../services/email.service');
 
 exports.donate = async (req, res) => {
   try {
-    console.log('=== DONATE HIT ===');
-    console.log('req.user  :', req.user);
-    console.log('req.body  :', req.body);
-
     const { ngoId, campaignId, amount, paymentMethod } = req.body;
 
     if (!ngoId || !amount || amount <= 0)
@@ -17,12 +13,8 @@ exports.donate = async (req, res) => {
     const ngo = await Ngo.findById(ngoId);
     if (!ngo) return res.status(404).json({ message: 'NGO not found' });
 
-    console.log('NGO found :', ngo.name, '| email:', ngo.email);
-
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-
-    console.log('User found:', user.name, '| email:', user.email);
 
     let validatedCampaignId = null;
     let campaign            = null;
@@ -38,31 +30,6 @@ exports.donate = async (req, res) => {
         { _id: ngoId, 'campaigns._id': campaign._id },
         { $inc: { 'campaigns.$.raised': amount } }
       );
-
-      const updatedNgo      = await Ngo.findById(ngoId);
-      const updatedCampaign = updatedNgo.campaigns.find(c => c._id.toString() === campaignId);
-      const pct             = Math.round(((updatedCampaign.raised || 0) / (updatedCampaign.goal || 1)) * 100);
-
-      // Milestone email at 50% and 100%
-      if ((pct >= 50 && pct < 55) || pct >= 100) {
-        const milestone = pct >= 100 ? 100 : 50;
-        if (ngo.email) {
-          await sendEmail({
-            to:           ngo.email,
-            subject:      `Campaign "${updatedCampaign.title}" hit ${milestone}% of its goal`,
-            templateName: 'campaignMilestone',
-            variables: {
-              ngoName:       ngo.name,
-              campaignTitle: updatedCampaign.title,
-              pct:           milestone,
-              raised:        updatedCampaign.raised.toLocaleString('en-IN'),
-              goal:          updatedCampaign.goal.toLocaleString('en-IN'),
-            },
-          });
-        } else {
-          console.warn('Milestone email skipped — NGO has no email:', ngo.name);
-        }
-      }
     }
 
     const donation = await Donation.create({
@@ -74,12 +41,15 @@ exports.donate = async (req, res) => {
       paymentMethod: paymentMethod || 'card',
     });
 
+    // ✅ Respond immediately — don't wait for emails
+    res.status(201).json({ message: 'Donation successful!', donation });
+
+    // ── Fire all emails in background after response ──────────────
     const formattedAmount = Number(amount).toLocaleString('en-IN');
     const formattedDate   = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
     // Receipt to donor
-    console.log('Sending receipt to donor:', user.email);
-    await sendEmail({
+    sendEmail({
       to:           user.email,
       subject:      `Donation Receipt — ₹${formattedAmount} to ${ngo.name}`,
       templateName: 'donationReceipt',
@@ -92,12 +62,11 @@ exports.donate = async (req, res) => {
         date:          formattedDate,
         paymentMethod: paymentMethod || 'Card',
       },
-    });
+    }).catch(err => console.error('Donor receipt email failed:', err));
 
     // Alert to NGO
     if (ngo.email) {
-      console.log('Sending alert to NGO:', ngo.email);
-      await sendEmail({
+      sendEmail({
         to:           ngo.email,
         subject:      `New donation received — ₹${formattedAmount}`,
         templateName: 'donationNgoAlert',
@@ -108,12 +77,34 @@ exports.donate = async (req, res) => {
           campaignTitle: campaign?.title || 'General Donation',
           date:          formattedDate,
         },
-      });
-    } else {
-      console.warn('NGO alert skipped — NGO has no email:', ngo.name);
+      }).catch(err => console.error('NGO alert email failed:', err));
     }
 
-    res.status(201).json({ message: 'Donation successful!', donation });
+    // Milestone email
+    if (campaignId) {
+      Ngo.findById(ngoId).then(updatedNgo => {
+        const updatedCampaign = updatedNgo.campaigns.find(c => c._id.toString() === campaignId);
+        const pct = Math.round(((updatedCampaign.raised || 0) / (updatedCampaign.goal || 1)) * 100);
+        if ((pct >= 50 && pct < 55) || pct >= 100) {
+          const milestone = pct >= 100 ? 100 : 50;
+          if (ngo.email) {
+            sendEmail({
+              to:           ngo.email,
+              subject:      `Campaign "${updatedCampaign.title}" hit ${milestone}% of its goal`,
+              templateName: 'campaignMilestone',
+              variables: {
+                ngoName:       ngo.name,
+                campaignTitle: updatedCampaign.title,
+                pct:           milestone,
+                raised:        updatedCampaign.raised.toLocaleString('en-IN'),
+                goal:          updatedCampaign.goal.toLocaleString('en-IN'),
+              },
+            }).catch(err => console.error('Milestone email failed:', err));
+          }
+        }
+      }).catch(console.error);
+    }
+
   } catch (err) {
     console.error('DONATE ERROR:', err);
     res.status(500).json({ message: 'Server error during donation.' });
