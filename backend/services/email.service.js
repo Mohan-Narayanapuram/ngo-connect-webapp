@@ -1,43 +1,24 @@
-const axios  = require('axios');
-const fs     = require('fs');
-const path   = require('path');
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const sendEmail = async ({ to, subject, templateName, variables = {} }) => {
+const sendEmail = async ({ to, subject, html }) => {
   try {
-    const templatePath = path.join(__dirname, '..', 'templates', `${templateName}.html`);
-    let html = fs.readFileSync(templatePath, 'utf-8');
-
-    Object.entries(variables).forEach(([key, val]) => {
-      html = html.replaceAll(`{{${key}}}`, val ?? '');
+    const { data, error } = await resend.emails.send({
+      from: 'NGO Connect <onboarding@resend.dev>',
+      to,
+      subject,
+      html,
     });
 
-    html = html
-      .replaceAll('{{APP_NAME}}', process.env.APP_NAME || 'NGO Connect')
-      .replaceAll('{{APP_URL}}',  process.env.APP_URL  || 'https://ngo-connect-webapp.vercel.app')
-      .replaceAll('{{YEAR}}',     new Date().getFullYear());
+    if (error) {
+      console.error(`❌ Email failed → ${to}\n`, error);
+      return;
+    }
 
-    await axios.post(
-      'https://api.brevo.com/v3/smtp/email',
-      {
-        sender:      { name: process.env.APP_NAME || 'NGO Connect', email: process.env.EMAIL_USER },
-        to:          [{ email: to }],
-        subject,
-        htmlContent: html,
-      },
-      {
-        headers: {
-          'api-key':     process.env.BREVO_API_KEY,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    console.log(`✅ Email sent → ${to} [${templateName}]`);
+    console.log(`✅ Email sent → ${to} [${subject}]`);
   } catch (err) {
-    console.error(`❌ Email failed → ${to} [${templateName}]`);
-    console.error('Error code    :', err.code);
-    console.error('Error message :', err.response?.data || err.message);
+    console.error(`❌ Email error → ${err.message}`);
   }
 };
 
-module.exports = { sendEmail };
+module.exports = sendEmail;
