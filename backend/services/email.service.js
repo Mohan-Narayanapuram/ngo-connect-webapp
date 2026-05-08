@@ -1,25 +1,6 @@
-const nodemailer = require('nodemailer');
-const fs         = require('fs');
-const path       = require('path');
-
-const transporter = nodemailer.createTransport({
-  host:   'smtp-relay.brevo.com',
-  port:   587,
-  secure: false,
-  auth: {
-    user: process.env.BREVO_USER,
-    pass: process.env.BREVO_PASS,
-  },
-});
-
-// Verify SMTP connection on server start
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('❌ SMTP connection failed:', error.message);
-  } else {
-    console.log('✅ SMTP server is ready to send emails');
-  }
-});
+const axios  = require('axios');
+const fs     = require('fs');
+const path   = require('path');
 
 const sendEmail = async ({ to, subject, templateName, variables = {} }) => {
   try {
@@ -35,19 +16,27 @@ const sendEmail = async ({ to, subject, templateName, variables = {} }) => {
       .replaceAll('{{APP_URL}}',  process.env.APP_URL  || 'https://ngo-connect-webapp.vercel.app')
       .replaceAll('{{YEAR}}',     new Date().getFullYear());
 
-    await transporter.sendMail({
-      from:    `"${process.env.APP_NAME || 'NGO Connect'}" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html,
-    });
+    await axios.post(
+      'https://api.brevo.com/v3/smtp/email',
+      {
+        sender:      { name: process.env.APP_NAME || 'NGO Connect', email: process.env.EMAIL_USER },
+        to:          [{ email: to }],
+        subject,
+        htmlContent: html,
+      },
+      {
+        headers: {
+          'api-key':     process.env.BREVO_API_KEY,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
     console.log(`✅ Email sent → ${to} [${templateName}]`);
   } catch (err) {
     console.error(`❌ Email failed → ${to} [${templateName}]`);
     console.error('Error code    :', err.code);
-    console.error('Error message :', err.message);
-    console.error('Full error    :', err);
+    console.error('Error message :', err.response?.data || err.message);
   }
 };
 
