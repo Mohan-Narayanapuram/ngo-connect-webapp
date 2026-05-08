@@ -19,10 +19,10 @@ const sendEmail = async ({ to, subject, templateName, variables = {} }) => {
       .replaceAll('{{YEAR}}',     new Date().getFullYear());
 
     await resend.emails.send({
-      from: 'NGO Connect <onboarding@resend.dev>',
-      to,
-      subject,
-      html,
+    from: 'NGO Connect <onboarding@resend.dev>',
+    to: process.env.ADMIN_EMAIL, // ← always sends to you
+    subject,
+    html,
     });
 
     console.log(`✅ Email sent → ${to} [${templateName}]`);
