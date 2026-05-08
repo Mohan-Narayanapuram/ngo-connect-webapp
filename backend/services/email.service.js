@@ -16,6 +16,15 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Verify SMTP connection on server start
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('❌ SMTP connection failed:', error.message);
+  } else {
+    console.log('✅ SMTP server is ready to send emails');
+  }
+});
+
 const sendEmail = async ({ to, subject, templateName, variables = {} }) => {
   try {
     const templatePath = path.join(__dirname, '..', 'templates', `${templateName}.html`);
