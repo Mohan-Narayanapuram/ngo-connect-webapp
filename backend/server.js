@@ -8,7 +8,7 @@ const app = express();
 app.use(cors({
   origin: [
     'https://ngo-connect-webapp.vercel.app',
-    'http://localhost:5173',
+    'https://ngo-connect-webapp-production.up.railway.app'
   ],
   credentials: true,
 }));
