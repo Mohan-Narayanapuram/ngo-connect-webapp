@@ -1,8 +1,17 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 const fs   = require('fs');
 const path = require('path');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    type: 'OAuth2',
+    user: process.env.EMAIL_USER,
+    clientId:     process.env.GMAIL_CLIENT_ID,
+    clientSecret: process.env.GMAIL_CLIENT_SECRET,
+    refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+  },
+});
 
 const sendEmail = async ({ to, subject, templateName, variables = {} }) => {
   try {
@@ -18,11 +27,11 @@ const sendEmail = async ({ to, subject, templateName, variables = {} }) => {
       .replaceAll('{{APP_URL}}',  process.env.APP_URL  || 'https://ngo-connect-webapp.vercel.app')
       .replaceAll('{{YEAR}}',     new Date().getFullYear());
 
-    await resend.emails.send({
-    from: 'NGO Connect <onboarding@resend.dev>',
-    to: process.env.ADMIN_EMAIL, // ← always sends to you
-    subject,
-    html,
+    await transporter.sendMail({
+      from: `"${process.env.APP_NAME || 'NGO Connect'}" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html,
     });
 
     console.log(`✅ Email sent → ${to} [${templateName}]`);
