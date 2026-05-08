@@ -1,17 +1,8 @@
-const nodemailer = require('nodemailer');
-const fs         = require('fs');
-const path       = require('path');
+const { Resend } = require('resend');
+const fs   = require('fs');
+const path = require('path');
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  family: 4,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, templateName, variables = {} }) => {
   try {
@@ -23,21 +14,21 @@ const sendEmail = async ({ to, subject, templateName, variables = {} }) => {
     });
 
     html = html
-      .replaceAll('{{APP_NAME}}', process.env.APP_NAME || 'NGO Connect WebApp')
+      .replaceAll('{{APP_NAME}}', process.env.APP_NAME || 'NGO Connect')
       .replaceAll('{{APP_URL}}',  process.env.APP_URL  || 'https://ngo-connect-webapp.vercel.app')
       .replaceAll('{{YEAR}}',     new Date().getFullYear());
 
-    await transporter.sendMail({
-      from: `"${process.env.APP_NAME || 'NGO Connect'}" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: 'NGO Connect <onboarding@resend.dev>',
       to,
       subject,
       html,
     });
 
-    console.log(`Email sent → ${to} [${templateName}]`);
- } catch (err) {
-  console.error('EMAIL ERROR FULL:', err); // ← change this line, log full error not just message
-}
+    console.log(`✅ Email sent → ${to} [${templateName}]`);
+  } catch (err) {
+    console.error('EMAIL ERROR FULL:', err);
+  }
 };
 
 module.exports = { sendEmail };
