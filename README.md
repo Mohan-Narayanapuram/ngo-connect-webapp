@@ -133,7 +133,7 @@ PORT=5000
 
 Clone Repository:
 
-git clone https://github.com/your-username/ngo-connect-webapp.git  
+git clone [https://github.com/Mohan-Narayanapuram/ngo-connect-webapp.git](https://github.com/Mohan-Narayanapuram/ngo-connect-webapp)  
 cd ngo-connect-webapp  
 
 Backend Setup:
